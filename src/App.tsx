@@ -5,8 +5,8 @@ import {
   createRoutesFromElements,
   redirect,
 } from "react-router-dom";
-import { HomePage, LoginPage, NotFoundPage } from "./pages";
-import { callAPI, getPlayerAuth, getURLPathnameFromRequest } from "./utils";
+import { HomePage, LoginPage, NotFoundPage, SignupPage } from "./pages";
+import { callAPI, getURLPathnameFromRequest } from "./utils";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -15,15 +15,8 @@ const router = createBrowserRouter(
       loader={async ({ request }) => {
         const urlPathname = getURLPathnameFromRequest(request);
         if (!["/login", "/signup"].includes(urlPathname)) {
-          const playerAuth = getPlayerAuth();
-          if (!playerAuth) {
-            return redirect("/login");
-          }
-          const resp = await callAPI(
-            "/auth/is-authed?playerId=" + encodeURIComponent(playerAuth)
-          );
-          const isAuthed = resp.text();
-          if (!isAuthed) {
+          const resp = await callAPI("/test");
+          if (resp.status !== 200) {
             return redirect("/login");
           }
         }
@@ -33,6 +26,7 @@ const router = createBrowserRouter(
     >
       <Route path="" element={<HomePage />} />
       <Route path="login" element={<LoginPage />} />
+      <Route path="signup" element={<SignupPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Route>
   )
