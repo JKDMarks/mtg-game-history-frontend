@@ -5,7 +5,14 @@ import {
   createRoutesFromElements,
   redirect,
 } from "react-router-dom";
-import { HomePage, LoginPage, NotFoundPage, SignupPage } from "./pages";
+import {
+  GamePage,
+  HomePage,
+  LoginPage,
+  NewGamePage,
+  NotFoundPage,
+  SignupPage,
+} from "./pages";
 import { callAPI, getURLPathnameFromRequest } from "./helpers/utils";
 
 const router = createBrowserRouter(
@@ -27,6 +34,10 @@ const router = createBrowserRouter(
       <Route path="" element={<HomePage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="signup" element={<SignupPage />} />
+      <Route path="games">
+        <Route path="new" element={<NewGamePage />} />
+        <Route path=":gameId" element={<GamePage />} />
+      </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Route>
   )

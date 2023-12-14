@@ -1,4 +1,6 @@
-import { AppBar, Box, Container, Toolbar } from "@mui/material";
+import { AppBar, Box, Container, Toolbar, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
+import { callAPI } from "../helpers/utils";
 
 export default function PageWrapper({
   children,
@@ -9,7 +11,17 @@ export default function PageWrapper({
     <Box className="min-h-screen flex flex-col">
       <AppBar position="static" className="self-start">
         <Container maxWidth="xl">
-          <Toolbar disableGutters>hi</Toolbar>
+          <Toolbar disableGutters>
+            <Typography variant="h6" component={Link} to="/">
+              MTG Game History
+            </Typography>
+            <Box sx={{ flexGrow: 1 }}></Box>
+            <Box sx={{ flexGrow: 0 }}>
+              <Link to="/login" onClick={() => callAPI("/auth/logout")}>
+                Logout
+              </Link>{" "}
+            </Box>
+          </Toolbar>
         </Container>
       </AppBar>
       <Box
