@@ -3,8 +3,16 @@
 @tailwind utilities;
 
 body {
-  background: linear-gradient(to top left, transparent, rgb(103, 129, 207))
-    rgb(123, 110, 207);
+  /* background: linear-gradient(to top left, transparent, rgb(124, 157, 248))
+    rgb(123, 110, 207); */
+  background-image: linear-gradient(
+    to bottom right,
+    #fffbd5 10%,
+    #aae0fa,
+    #c2bcba,
+    #faaa8f,
+    #9bd3ae 90%
+  );
   height: 100vh;
   background-attachment: fixed;
 }
