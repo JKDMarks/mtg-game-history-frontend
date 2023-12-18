@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { PageWrapper } from "../../components";
+import { PageWrapper } from "../../hocs";
 import { Box, Grid, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Game } from "../../helpers/types";

@@ -8,30 +8,102 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { PageWrapper } from "../../components";
+
+import { PageWrapper } from "../../hocs";
 import { useEffect, useState } from "react";
-import { Player } from "../../helpers/types";
-import { callAPI, getPlayerName } from "../../helpers/utils";
+import { Deck, Player } from "../../helpers/types";
+import { callAPI } from "../../helpers/utils";
+import { fakeDeck, fakePlayer } from "../../helpers/constants";
+
+import NewGameSinglePlayerdeck from "./NewGameSinglePlayerdeck";
+
+export type NewPlayerdeck = {
+  player: Player;
+  deck: Deck;
+};
+
+const emptyNewPlayerdeck: NewPlayerdeck = {
+  player: { ...fakePlayer },
+  deck: { ...fakeDeck },
+};
+
+export type SetNewPlayerdeckFunctionType = ({
+  player,
+  deck,
+}: {
+  player?: Player | null;
+  deck?: Deck | null;
+}) => void;
 
 export default function NewGamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
-  const [decks, setDecks] = useState<Player[]>([]);
+  const [decks, setDecks] = useState<Deck[]>([]);
+  const [newPlayerdecks, setNewPlayerdecks] = useState<NewPlayerdeck[]>([
+    structuredClone(emptyNewPlayerdeck),
+    structuredClone(emptyNewPlayerdeck),
+    structuredClone(emptyNewPlayerdeck),
+    structuredClone(emptyNewPlayerdeck),
+  ]);
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<number>>(
+    new Set()
+  );
+  const [selectedDeckIds, setSelectedDeckIds] = useState<Set<number>>(
+    new Set()
+  );
+
+  useEffect(() => {
+    const newSelectedPlayerIds = new Set<number>();
+    const newSelectedDeckIds = new Set<number>();
+    newPlayerdecks.forEach((newPlayerdeck) => {
+      newSelectedPlayerIds.add(newPlayerdeck.player.id);
+      newSelectedDeckIds.add(newPlayerdeck.deck.id);
+    });
+    setSelectedPlayerIds(newSelectedPlayerIds);
+    setSelectedDeckIds(newSelectedDeckIds);
+  }, [newPlayerdecks]);
 
   useEffect(() => {
     const fetchPlayers = async () => {
       const resp = await callAPI("/players");
-      const players = await resp.json();
-      setPlayers(players);
+      const players: Player[] = await resp.json();
+      const sortedPlayers = [...players].sort((p1, p2) =>
+        p1.name.localeCompare(p2.name)
+      );
+      setPlayers(sortedPlayers);
     };
     const fetchDecks = async () => {
       const resp = await callAPI("/decks");
-      const decks = await resp.json();
-      setDecks(decks);
+      const decks: Deck[] = await resp.json();
+      const sortedDecks = [...decks].sort(
+        (d1, d2) =>
+          d1.Player.id - d2.Player.id || d1.name.localeCompare(d2.name)
+      );
+      setDecks(sortedDecks);
     };
 
     fetchPlayers();
     fetchDecks();
   }, []);
+
+  const setNthNewPlayerdeckFactory =
+    (n: number): SetNewPlayerdeckFunctionType =>
+    ({ player, deck }) => {
+      const tempNewPlayerdecks = structuredClone(newPlayerdecks);
+
+      if (player) {
+        tempNewPlayerdecks[n].player = player;
+      } else if (player === null) {
+        tempNewPlayerdecks[n].player = structuredClone(fakePlayer);
+      }
+
+      if (deck) {
+        tempNewPlayerdecks[n].deck = deck;
+      } else if (deck === null) {
+        tempNewPlayerdecks[n].deck = structuredClone(fakeDeck);
+      }
+
+      setNewPlayerdecks(tempNewPlayerdecks);
+    };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,58 +121,18 @@ export default function NewGamePage() {
         </Typography>
         <FormControl component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2} columns={{ xs: 1, md: 2, lg: 4 }}>
-            <Grid item xs={1}>
-              <Grid container columns={1}>
-                <Grid item xs={1}>
-                  <Select label="Player 1" sx={{ width: "100%" }}>
-                    {players.map((player) => (
-                      <MenuItem value={player.username}>
-                        {getPlayerName(player)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Grid>
-                <Grid item xs={1}>
-                  bottom
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={1}>
-              <Grid container columns={1}>
-                <Grid item xs={1}>
-                  <Select label="Player 1" sx={{ width: "100%", color: "red" }}>
-                    {players.map((player) => (
-                      <MenuItem value={player.id}>
-                        {getPlayerName(player)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Grid>
-                <Grid item xs={1}>
-                  bottom
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={1}>
-              <Grid container columns={1}>
-                <Grid item xs={1}>
-                  top
-                </Grid>
-                <Grid item xs={1}>
-                  bottom
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={1}>
-              <Grid container columns={1}>
-                <Grid item xs={1}>
-                  top
-                </Grid>
-                <Grid item xs={1}>
-                  bottom
-                </Grid>
-              </Grid>
-            </Grid>
+            {newPlayerdecks.map((newPlayerdeck, i) => (
+              <NewGameSinglePlayerdeck
+                index={i}
+                key={`player-${i}`}
+                newPlayerdeck={newPlayerdeck}
+                setNewPlayerdeck={setNthNewPlayerdeckFactory(i)}
+                players={players}
+                decks={decks}
+                selectedPlayerIds={selectedPlayerIds}
+                selectedDeckIds={selectedDeckIds}
+              />
+            ))}
           </Grid>
         </FormControl>
       </Box>

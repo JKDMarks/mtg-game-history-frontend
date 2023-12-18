@@ -18,14 +18,15 @@ export type Location = {
 
 export type Player = {
   id: number;
-  name: string | null;
+  name: string;
   username: string;
+  Decks?: Deck[];
 };
 
 export type Deck = {
   id: number;
   name: string;
-  Player?: Player;
+  Player: Player;
 };
 
 export type GamePlayerDeck = {

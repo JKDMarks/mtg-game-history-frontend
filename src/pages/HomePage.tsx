@@ -4,7 +4,7 @@ import { Box, Button, Grid, Link as MUILink } from "@mui/material";
 
 import { callAPI, getPlayerName } from "../helpers/utils";
 import { Game, Player } from "../helpers/types";
-import { PageWrapper } from "../components";
+import { PageWrapper } from "../hocs";
 
 function HomePage() {
   const navigate = useNavigate();

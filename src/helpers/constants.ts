@@ -14,12 +14,12 @@ export const fakeGame: Game = {
 
 export const fakePlayer: Player = {
   id: -1,
-  name: null,
-  username: "x",
+  name: "",
+  username: "",
 };
 
 export const fakeDeck: Deck = {
   id: -1,
-  name: "very cool deck but it is not real",
+  name: "",
   Player: { ...fakePlayer },
 };
