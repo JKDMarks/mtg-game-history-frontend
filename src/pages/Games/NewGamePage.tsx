@@ -1,21 +1,15 @@
-import {
-  Autocomplete,
-  Box,
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, FormControl, Grid, Typography } from "@mui/material";
 
 import { PageWrapper } from "../../hocs";
-import { useEffect, useState } from "react";
-import { Deck, Player } from "../../helpers/types";
+import React, { useEffect, useState } from "react";
+import { Deck, Game, Player } from "../../helpers/types";
 import { callAPI } from "../../helpers/utils";
 import { fakeDeck, fakePlayer } from "../../helpers/constants";
 
 import NewGameSinglePlayerdeck from "./NewGameSinglePlayerdeck";
+import NewPlayerDialog from "./NewPlayerDialog";
+import NewDeckDialog from "./NewDeckDialog";
+import moment from "moment";
 
 export type NewPlayerdeck = {
   player: Player;
@@ -51,6 +45,57 @@ export default function NewGamePage() {
     new Set()
   );
 
+  const fetchMostRecentGameOrCurrentPlayer = async () => {
+    const resp = await callAPI("/games/recent");
+    const mostRecentGame: Game = await resp.json();
+    const todaysDate = moment().format("YYYY-MM-DD");
+
+    if (
+      mostRecentGame &&
+      // mostRecentGame.date === todaysDate &&
+      mostRecentGame.GamePlayerDecks
+    ) {
+      const tempNewPlayerdecks = mostRecentGame.GamePlayerDecks.map(
+        ({ Player, Deck }) => ({
+          player: Player,
+          deck: Deck,
+        })
+      );
+      setNewPlayerdecks(tempNewPlayerdecks);
+    }
+
+    console.log("***me", mostRecentGame);
+    // const tempNewPlayerdecks = structuredClone(newPlayerdecks);
+    // tempNewPlayerdecks[0].player = me;
+    // setNewPlayerdecks(tempNewPlayerdecks);
+  };
+  const fetchPlayers = async (firstLoad: boolean = false) => {
+    const resp = await callAPI("/players");
+    const players: Player[] = await resp.json();
+    const sortedPlayers = [...players].sort((p1, p2) =>
+      p1.name.localeCompare(p2.name)
+    );
+    setPlayers(sortedPlayers);
+    if (firstLoad) {
+      await fetchMostRecentGameOrCurrentPlayer();
+    }
+  };
+  const fetchDecks = async () => {
+    const resp = await callAPI("/decks");
+    const decks: Deck[] = await resp.json();
+    const sortedDecks = [...decks].sort(
+      (d1, d2) => d1.Player.id - d2.Player.id || d1.name.localeCompare(d2.name)
+    );
+    setDecks(sortedDecks);
+  };
+  // fetch players and decks on first load
+  useEffect(() => {
+    fetchPlayers(true);
+    fetchDecks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // unique player and deck ids; used to disallow multiples
   useEffect(() => {
     const newSelectedPlayerIds = new Set<number>();
     const newSelectedDeckIds = new Set<number>();
@@ -61,29 +106,6 @@ export default function NewGamePage() {
     setSelectedPlayerIds(newSelectedPlayerIds);
     setSelectedDeckIds(newSelectedDeckIds);
   }, [newPlayerdecks]);
-
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      const resp = await callAPI("/players");
-      const players: Player[] = await resp.json();
-      const sortedPlayers = [...players].sort((p1, p2) =>
-        p1.name.localeCompare(p2.name)
-      );
-      setPlayers(sortedPlayers);
-    };
-    const fetchDecks = async () => {
-      const resp = await callAPI("/decks");
-      const decks: Deck[] = await resp.json();
-      const sortedDecks = [...decks].sort(
-        (d1, d2) =>
-          d1.Player.id - d2.Player.id || d1.name.localeCompare(d2.name)
-      );
-      setDecks(sortedDecks);
-    };
-
-    fetchPlayers();
-    fetchDecks();
-  }, []);
 
   const setNthNewPlayerdeckFactory =
     (n: number): SetNewPlayerdeckFunctionType =>
@@ -104,6 +126,69 @@ export default function NewGamePage() {
 
       setNewPlayerdecks(tempNewPlayerdecks);
     };
+
+  // NEW PLAYER DIALOG FUNCTIONALITY
+  const [isNewPlayerDialogOpen, setIsNewPlayerDialogOpen] =
+    useState<boolean>(false);
+  const [newPlayerDialogPlayerName, setNewPlayerDialogPlayerName] =
+    useState<string>("");
+  const [newPlayerDialogOpenedFromIndex, setNewPlayerDialogOpenedFromIndex] =
+    useState<number>(-1);
+
+  const handleOpenNewPlayerDialog = (playerName: string, index: number) => {
+    setNewPlayerDialogPlayerName(playerName);
+    setNewPlayerDialogOpenedFromIndex(index);
+    setIsNewPlayerDialogOpen(true);
+  };
+  const handleCloseNewPlayerDialog = () => {
+    setIsNewPlayerDialogOpen(false);
+    setNewPlayerDialogPlayerName("");
+    setNewPlayerDialogOpenedFromIndex(-1);
+  };
+  const handleSubmitNewPlayerDialog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const resp = await callAPI("/players", {
+      method: "POST",
+      body: { name: newPlayerDialogPlayerName },
+    });
+    const newPlayer = await resp.json();
+    const tempNewPlayerdecks = structuredClone(newPlayerdecks);
+    tempNewPlayerdecks[newPlayerDialogOpenedFromIndex].player = newPlayer;
+    setNewPlayerdecks(tempNewPlayerdecks);
+    fetchPlayers();
+    handleCloseNewPlayerDialog();
+  };
+
+  // NEW DECK DIALOG FUNCTIONALITY
+  const [isNewDeckDialogOpen, setIsNewDeckDialogOpen] =
+    useState<boolean>(false);
+  const [newDeckDialogPlayer, setNewDeckDialogPlayer] = useState<Player>({
+    ...fakePlayer,
+  });
+  const [newDeckDialogDeckName, setNewDeckDialogDeckName] =
+    useState<string>("");
+  const [newDeckDialogOpenedFromIndex, setNewDeckDialogOpenedFromIndex] =
+    useState<number>(-1);
+
+  const handleOpenNewDeckDialog = (
+    player: Player,
+    deckName: string,
+    index: number
+  ) => {
+    setNewDeckDialogPlayer(player);
+    setNewDeckDialogDeckName(deckName);
+    setNewDeckDialogOpenedFromIndex(index);
+    setIsNewDeckDialogOpen(true);
+  };
+  const handleCloseNewDeckDialog = () => {
+    setNewDeckDialogPlayer({ ...fakePlayer });
+    setIsNewDeckDialogOpen(false);
+    setNewDeckDialogDeckName("");
+    setNewDeckDialogOpenedFromIndex(-1);
+  };
+  const handleSubmitNewDeckDialog = async (e: React.FormEvent) => {
+    e.preventDefault();
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,11 +216,25 @@ export default function NewGamePage() {
                 decks={decks}
                 selectedPlayerIds={selectedPlayerIds}
                 selectedDeckIds={selectedDeckIds}
+                openNewPlayerDialog={handleOpenNewPlayerDialog}
+                openNewDeckDialog={handleOpenNewDeckDialog}
               />
             ))}
           </Grid>
         </FormControl>
       </Box>
+      <NewPlayerDialog
+        open={isNewPlayerDialogOpen}
+        newPlayerName={newPlayerDialogPlayerName}
+        setNewPlayerName={setNewPlayerDialogPlayerName}
+        handleClose={handleCloseNewPlayerDialog}
+        handleSubmit={handleSubmitNewPlayerDialog}
+      />
+      <NewDeckDialog
+        open={isNewDeckDialogOpen}
+        handleClose={handleCloseNewDeckDialog}
+        handleSubmit={handleSubmitNewDeckDialog}
+      />
     </PageWrapper>
   );
 }

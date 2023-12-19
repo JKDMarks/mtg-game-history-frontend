@@ -14,6 +14,7 @@ type AuthForm = "LOGIN" | "SIGNUP";
 export default function GenericAuthForm({ type }: { type: AuthForm }) {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -31,7 +32,7 @@ export default function GenericAuthForm({ type }: { type: AuthForm }) {
     const apiRoute = type === "LOGIN" ? "/auth/login" : "/auth/signup";
     const resp = await callAPI(apiRoute, {
       method: "POST",
-      body: { username, password },
+      body: { username, name, password },
     });
     const respJson = await resp.json();
 
@@ -53,17 +54,37 @@ export default function GenericAuthForm({ type }: { type: AuthForm }) {
           borderRadius: "7px",
         }}
       >
-        <Box className="text-xl font-bold">Login</Box>
+        <Box className="text-xl font-bold">
+          {type === "LOGIN" ? "Login" : "Signup"}
+        </Box>
         <Box sx={{ width: "100%", borderBottom: "1px solid black" }}></Box>
         <FormControl
           component="form"
           className="space-y-2"
           onSubmit={handleSubmit}
+          sx={{ marginX: "1.5rem" }}
         >
           <TextField
             label="Username"
             onChange={(e) => setUsername(e.target.value)}
           />
+          {type === "SIGNUP" && (
+            <>
+              <FormHelperText sx={{ marginTop: "0 !important" }}>
+                This name you will use to login. It must be 1-20 characters long
+                and contain only A-Z, 0-9, and <code>_</code>.
+              </FormHelperText>
+              <TextField
+                label="Display Name"
+                onChange={(e) => setName(e.target.value)}
+              />
+              <FormHelperText sx={{ marginTop: "0 !important" }}>
+                This name is what other players will see. Consider using a last
+                name or last initial. It must be 2-63 characters long and
+                contain only A-Z, <code>,.'-</code>, and spaces.
+              </FormHelperText>
+            </>
+          )}
           <TextField
             type="password"
             label="Password"

@@ -30,7 +30,7 @@ export type Deck = {
 };
 
 export type GamePlayerDeck = {
-  isWinner: boolean;
+  isWinner: boolean | null;
   GameId: number;
   Player: Player;
   Deck: Deck;
