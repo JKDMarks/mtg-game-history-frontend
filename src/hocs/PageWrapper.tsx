@@ -1,6 +1,6 @@
 import { AppBar, Box, Container, Toolbar, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import { callAPI } from "../helpers/utils";
+import { callAPI } from "../helpers";
 
 export default function PageWrapper({
   children,

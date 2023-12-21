@@ -6,8 +6,9 @@ import {
   TextField,
 } from "@mui/material";
 import React, { useState } from "react";
-import { callAPI } from "../../helpers/utils";
 import { useNavigate } from "react-router-dom";
+
+import { callAPI } from "../../helpers";
 
 type AuthForm = "LOGIN" | "SIGNUP";
 

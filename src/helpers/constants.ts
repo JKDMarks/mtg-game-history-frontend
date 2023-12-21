@@ -23,3 +23,21 @@ export const fakeDeck: Deck = {
   name: "",
   Player: { ...fakePlayer },
 };
+
+export type NewPlayerdeck = {
+  player: Player;
+  deck: Deck;
+};
+
+export const emptyNewPlayerdeck: NewPlayerdeck = {
+  player: { ...fakePlayer },
+  deck: { ...fakeDeck },
+};
+
+export type SetNewPlayerdeckFunctionType = ({
+  player,
+  deck,
+}: {
+  player?: Player | null;
+  deck?: Deck | null;
+}) => void;

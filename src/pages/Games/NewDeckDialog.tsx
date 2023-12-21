@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -7,8 +8,29 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
+import { Player } from "../../helpers";
 
-export default function NewDeckDialog({ open, handleClose, handleSubmit }) {
+type NewDeckDialogProps = {
+  open: boolean;
+  players: Player[];
+  newDeckName: string;
+  newDeckPlayer: Player;
+  setNewDeckName: (name: string) => void;
+  setNewDeckPlayer: (player: Player) => void;
+  handleClose: () => void;
+  handleSubmit: (e: React.FormEvent) => void;
+};
+
+export default function NewDeckDialog({
+  open,
+  players,
+  newDeckName,
+  newDeckPlayer,
+  setNewDeckName,
+  setNewDeckPlayer,
+  handleClose,
+  handleSubmit,
+}: NewDeckDialogProps) {
   return (
     <Dialog open={open} onClose={handleClose}>
       <form onSubmit={handleSubmit}>
@@ -17,34 +39,25 @@ export default function NewDeckDialog({ open, handleClose, handleSubmit }) {
           <DialogContentText>
             Did you miss any film in our list? Please, add it!
           </DialogContentText>
+          <Autocomplete
+            id="player"
+            disableClearable
+            renderInput={(params) => <TextField {...params} label="Player" />}
+            options={players}
+            isOptionEqualToValue={(player, value) => player.id === value.id}
+            getOptionLabel={(player) => player.name}
+            value={newDeckPlayer}
+            onChange={(_, player) => setNewDeckPlayer(player)}
+          />
           <TextField
             autoFocus
             margin="dense"
-            id="name"
-            value={"asdf"}
-            // onChange={(event) =>
-            //   setDialogValue({
-            //     ...dialogValue,
-            //     title: event.target.value,
-            //   })
-            // }
-            label="title"
+            id="deck-name"
+            value={newDeckName}
+            onChange={(event) => setNewDeckName(event.target.value)}
+            label="New deck name"
             type="text"
-            variant="standard"
-          />
-          <TextField
-            margin="dense"
-            id="name"
-            value={1222}
-            // onChange={(event) =>
-            //   setDialogValue({
-            //     ...dialogValue,
-            //     year: event.target.value,
-            //   })
-            // }
-            label="year"
-            type="number"
-            variant="standard"
+            // variant="standard"
           />
         </DialogContent>
         <DialogActions>

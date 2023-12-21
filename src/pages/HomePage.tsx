@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Box, Button, Grid, Link as MUILink } from "@mui/material";
 
-import { callAPI, getPlayerName } from "../helpers/utils";
-import { Game, Player } from "../helpers/types";
+import { callAPI, getPlayerName, Game, Player } from "../helpers";
 import { PageWrapper } from "../hocs";
 
 function HomePage() {

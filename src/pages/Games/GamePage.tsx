@@ -2,9 +2,7 @@ import { useParams } from "react-router-dom";
 import { PageWrapper } from "../../hocs";
 import { Box, Grid, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Game } from "../../helpers/types";
-import { fakeGame } from "../../helpers/constants";
-import { callAPI, getPlayerName } from "../../helpers/utils";
+import { Game, fakeGame, callAPI, getPlayerName } from "../../helpers";
 
 export default function NewGamePage() {
   const { gameId } = useParams();

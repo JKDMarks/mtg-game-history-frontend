@@ -5,6 +5,7 @@ import {
   createRoutesFromElements,
   redirect,
 } from "react-router-dom";
+
 import {
   GamePage,
   HomePage,
@@ -13,7 +14,7 @@ import {
   NotFoundPage,
   SignupPage,
 } from "./pages";
-import { callAPI, getURLPathnameFromRequest } from "./helpers/utils";
+import { callAPI, getURLPathnameFromRequest } from "./helpers";
 
 const router = createBrowserRouter(
   createRoutesFromElements(

@@ -1,4 +1,2 @@
-import LoginPage from "./LoginPage";
-import SignupPage from "./SignupPage";
-
-export { LoginPage, SignupPage };
+export { default as LoginPage } from "./LoginPage";
+export { default as SignupPage } from "./SignupPage";

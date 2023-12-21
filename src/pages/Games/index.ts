@@ -1,4 +1,2 @@
-import GamePage from "./GamePage";
-import NewGamePage from "./NewGamePage";
-
-export { GamePage, NewGamePage };
+export { default as GamePage } from "./GamePage";
+export { default as NewGamePage } from "./NewGamePage";

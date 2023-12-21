@@ -1,6 +1,4 @@
-import HomePage from "./HomePage";
-import NotFoundPage from "./NotFoundPage";
-
-export { HomePage, NotFoundPage };
+export { default as HomePage } from "./HomePage";
+export { default as NotFoundPage } from "./NotFoundPage";
 export * from "./LoginSignup";
 export * from "./Games";
