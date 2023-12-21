@@ -2,27 +2,32 @@ import {
   Autocomplete,
   Box,
   Grid,
+  Switch,
   TextField,
   createFilterOptions,
 } from "@mui/material";
 import {
   Deck,
-  NewPlayerdeck,
+  NewGameErrors,
+  NewPlayerDeck,
   Player,
-  SetNewPlayerdeckFunctionType,
+  SetNewPlayerDeckFunctionType,
 } from "../../helpers";
 
 const playerFilter = createFilterOptions<Player>();
 const deckFilter = createFilterOptions<Deck>();
 
-type NewGameSinglePlayerdeckProps = {
+type NewGameSinglePlayerDeckProps = {
   index: number;
-  newPlayerdeck: NewPlayerdeck;
+  newPlayerDeck: NewPlayerDeck;
+  isWinner: boolean;
+  setWinnerIndex: (index: number) => void;
   selectedPlayerIds: Set<number>;
   selectedDeckIds: Set<number>;
   players: Player[];
   decks: Deck[];
-  setNewPlayerdeck: SetNewPlayerdeckFunctionType;
+  errors: NewGameErrors;
+  setNewPlayerDeck: SetNewPlayerDeckFunctionType;
   openNewPlayerDialog: (newPlayerName: string, index: number) => void;
   openNewDeckDialog: (player: Player, deckName: string, index: number) => void;
 };
@@ -32,18 +37,21 @@ type AutocompleteOption = {
   label: string;
 };
 
-export default function NewGameSinglePlayerdeck({
+export default function NewGameSinglePlayerDeck({
   index,
-  newPlayerdeck,
+  newPlayerDeck,
+  isWinner,
+  setWinnerIndex,
   selectedPlayerIds,
   selectedDeckIds,
   players,
   decks,
-  setNewPlayerdeck,
+  errors,
+  setNewPlayerDeck,
   openNewPlayerDialog,
   openNewDeckDialog,
-}: NewGameSinglePlayerdeckProps) {
-  const currPlayerId = newPlayerdeck.player.id;
+}: NewGameSinglePlayerDeckProps) {
+  const currPlayerId = newPlayerDeck.player.id;
   const orderedPlayerIds = [
     currPlayerId,
     ...players.map((player) => player.id),
@@ -57,11 +65,31 @@ export default function NewGameSinglePlayerdeck({
 
   return (
     <Grid item xs={1}>
-      <Box>Player {index + 1}</Box>
+      <Box>
+        <Box>Player {index + 1}</Box>
+        <Box className="flex flex-row justify-center items-center">
+          <Box>Winner</Box>
+          <Switch
+            checked={isWinner}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setWinnerIndex(index);
+              } else {
+                setWinnerIndex(-1);
+              }
+            }}
+          />
+        </Box>
+      </Box>
       <Autocomplete
         className="mb-4"
-        // freeSolo
-        renderInput={(params) => <TextField {...params} label="Player" />}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Player"
+            error={!!errors.playerDecks[index]?.player}
+          />
+        )}
         options={players}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         getOptionLabel={(option) => {
@@ -73,7 +101,7 @@ export default function NewGameSinglePlayerdeck({
           }
           return "please report this bug";
         }}
-        value={currPlayerId >= 0 ? newPlayerdeck.player : null}
+        value={currPlayerId > 0 ? newPlayerDeck.player : null}
         getOptionDisabled={(player) => selectedPlayerIds.has(player.id)}
         onChange={(_, option) => {
           if (typeof option === "string") {
@@ -85,7 +113,7 @@ export default function NewGameSinglePlayerdeck({
           ) {
             openNewPlayerDialog(option.inputValue, index);
           } else {
-            setNewPlayerdeck({ player: option });
+            setNewPlayerDeck({ player: option });
           }
         }}
         filterOptions={(options, params) => {
@@ -104,7 +132,13 @@ export default function NewGameSinglePlayerdeck({
       />
       <Autocomplete
         disabled={currPlayerId < 0}
-        renderInput={(params) => <TextField {...params} label="Deck" />}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Deck"
+            error={!!errors.playerDecks[index]?.deck}
+          />
+        )}
         options={orderedDecks}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         getOptionLabel={(option) => {
@@ -121,25 +155,25 @@ export default function NewGameSinglePlayerdeck({
         groupBy={(deck) => {
           if ("inputValue" in deck) return "Add new deck";
           return deck.Player.id === currPlayerId
-            ? `${newPlayerdeck.player.name}'s own decks`
+            ? `${newPlayerDeck.player.name}'s own decks`
             : "Other players' decks";
         }}
-        value={newPlayerdeck.deck.id >= 0 ? newPlayerdeck.deck : null}
+        value={newPlayerDeck.deck.id > 0 ? newPlayerDeck.deck : null}
         getOptionDisabled={(deck) => selectedDeckIds.has(deck.id)}
         onChange={(_, option) => {
           if (typeof option === "string") {
-            openNewDeckDialog(newPlayerdeck.player, option, index);
+            openNewDeckDialog(newPlayerDeck.player, option, index);
           } else if (
             option !== null &&
             "inputValue" in option &&
             typeof option.inputValue === "string"
           ) {
-            openNewDeckDialog(newPlayerdeck.player, option.inputValue, index);
+            openNewDeckDialog(newPlayerDeck.player, option.inputValue, index);
           } else {
-            setNewPlayerdeck({ deck: option });
+            setNewPlayerDeck({ deck: option });
           }
         }}
-        // onChange={(_, deck) => setNewPlayerdeck({ deck })}
+        // onChange={(_, deck) => setNewPlayerDeck({ deck })}
         filterOptions={(options, params) => {
           const filtered: (Deck | AutocompleteOption)[] = deckFilter(
             options,

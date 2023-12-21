@@ -9,6 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import { Player } from "../../helpers";
+import { useState } from "react";
 
 type NewDeckDialogProps = {
   open: boolean;
@@ -31,17 +32,42 @@ export default function NewDeckDialog({
   handleClose,
   handleSubmit,
 }: NewDeckDialogProps) {
+  const [errorMsg, setErrorMsg] = useState<string>("");
+
+  const checkErrorsAndSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg("");
+    const nameRgx = /^[a-z ,.'-]+$/i;
+    if (!newDeckName) {
+      setErrorMsg("Name can't be empty");
+      return;
+    } else if (newDeckName.length >= 128 || !newDeckName.match(nameRgx)) {
+      setErrorMsg("Invalid name");
+      return;
+    }
+    handleSubmit(e);
+  };
+
+  const resetErrorsAndClose = () => {
+    setErrorMsg("");
+    handleClose();
+  };
+
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <form onSubmit={handleSubmit}>
-        <DialogTitle>Add a new film</DialogTitle>
-        <DialogContent>
+    <Dialog open={open} onClose={resetErrorsAndClose} maxWidth="xs">
+      <form onSubmit={checkErrorsAndSubmit}>
+        <DialogTitle>Add a new deck</DialogTitle>
+        <DialogContent className="flex flex-col space-y-4">
           <DialogContentText>
-            Did you miss any film in our list? Please, add it!
+            Deck names should be in the format
+            <br />
+            [Commander Name] [Short Description]
+            <br />
+            e.g. Atraxa Infect or Korvold Treasure
           </DialogContentText>
           <Autocomplete
-            id="player"
             disableClearable
+            id="new-deck-dialog-new-player"
             renderInput={(params) => <TextField {...params} label="Player" />}
             options={players}
             isOptionEqualToValue={(player, value) => player.id === value.id}
@@ -51,17 +77,21 @@ export default function NewDeckDialog({
           />
           <TextField
             autoFocus
-            margin="dense"
-            id="deck-name"
+            id="new-deck-dialog-new-deck-name"
+            className="w-full mt-2"
             value={newDeckName}
             onChange={(event) => setNewDeckName(event.target.value)}
             label="New deck name"
             type="text"
-            // variant="standard"
           />
+          {errorMsg && (
+            <DialogContentText sx={{ color: "red" }}>
+              {errorMsg}
+            </DialogContentText>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={resetErrorsAndClose}>Cancel</Button>
           <Button type="submit">Add</Button>
         </DialogActions>
       </form>

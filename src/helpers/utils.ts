@@ -1,6 +1,6 @@
 import moment from "moment";
-import { Deck, Game, Player } from "./types";
-import { NewPlayerdeck, emptyNewPlayerdeck, fakeDeck } from "./constants";
+import { Deck, Game, GameLocation, Player } from "./types";
+import { NewPlayerDeck, emptyNewPlayerDeck, fakeDeck } from "./constants";
 
 export type HTTPMethod = "GET" | "POST";
 
@@ -26,39 +26,40 @@ export async function callAPI(
 export const getURLPathnameFromRequest = (request: Request) =>
   new URL(request.url).pathname;
 
-export const getPlayerName = (player?: Player) =>
-  player?.name ?? player?.username;
+export const getTodaysDate = () => moment().format("YYYY-MM-DD");
 
 export const fetchMostRecentGameOrCurrentPlayer = async (
-  setNewPlayerdecks: (newPlayerdecks: NewPlayerdeck[]) => void
+  setNewPlayerDecks: (newPlayerDecks: NewPlayerDeck[]) => void,
+  setLocation: (location: GameLocation) => void
 ) => {
   const resp = await callAPI("/games/recent");
   const mostRecentGame: Game = await resp.json();
-  const todaysDate = moment().format("YYYY-MM-DD");
+  console.log("***mostRecentGame", mostRecentGame);
 
   if (
     mostRecentGame &&
     // CHANGEME: undo this comment
-    // mostRecentGame.date === todaysDate &&
+    // mostRecentGame.date === getTodaysDate() &&
     mostRecentGame.GamePlayerDecks
   ) {
-    const tempNewPlayerdecks = mostRecentGame.GamePlayerDecks.map(
+    const tempNewPlayerDecks = mostRecentGame.GamePlayerDecks.map(
       ({ Player, Deck }) => ({
         player: Player,
         deck: Deck,
       })
     );
-    setNewPlayerdecks(tempNewPlayerdecks);
+    setNewPlayerDecks(tempNewPlayerDecks);
+    setLocation({ ...mostRecentGame.Location });
   } else {
     const resp2 = await callAPI("/players/me");
     const me: Player = await resp2.json();
-    const tempNewPlayerdecks: NewPlayerdeck[] = [
+    const tempNewPlayerDecks: NewPlayerDeck[] = [
       { player: me, deck: { ...fakeDeck } },
-      { ...emptyNewPlayerdeck },
-      { ...emptyNewPlayerdeck },
-      { ...emptyNewPlayerdeck },
+      { ...emptyNewPlayerDeck },
+      { ...emptyNewPlayerDeck },
+      { ...emptyNewPlayerDeck },
     ];
-    setNewPlayerdecks(tempNewPlayerdecks);
+    setNewPlayerDecks(tempNewPlayerDecks);
   }
 };
 
@@ -78,4 +79,15 @@ export const fetchDecks = async (setDecks: (decks: Deck[]) => void) => {
     (d1, d2) => d1.Player.id - d2.Player.id || d1.name.localeCompare(d2.name)
   );
   setDecks(sortedDecks);
+};
+
+export const fetchLocations = async (
+  setLocations: (locations: GameLocation[]) => void
+) => {
+  const resp = await callAPI("/locations");
+  const locations: GameLocation[] = await resp.json();
+  const sortedLocations = [...locations].sort((l1, l2) =>
+    l1.name.localeCompare(l2.name)
+  );
+  setLocations(sortedLocations);
 };

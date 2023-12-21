@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
-import { PageWrapper } from "../../hocs";
+import { PageWrapper } from "../../components";
 import { Box, Grid, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Game, fakeGame, callAPI, getPlayerName } from "../../helpers";
+import { Game, fakeGame, callAPI } from "../../helpers";
 
 export default function NewGamePage() {
   const { gameId } = useParams();
@@ -39,10 +39,10 @@ export default function NewGamePage() {
                 return (
                   <Grid item xs={1} md={1} lg={1}>
                     {gpd.isWinner && "⭐"}
-                    {getPlayerName(gpd.Player)}
+                    {gpd.Player.name}
                     {gpd.isWinner && "⭐"}
                     <br />
-                    {!didPlayOwnDeck && getPlayerName(gpd.Deck.Player) + "'s "}
+                    {!didPlayOwnDeck && `${gpd.Deck.Player.name}'s `}
                     {gpd.Deck.name}
                   </Grid>
                 );

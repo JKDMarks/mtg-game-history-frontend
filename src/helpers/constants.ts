@@ -1,4 +1,10 @@
-import { Deck, Game, Player } from "./types";
+import { Deck, Game, Player, GameLocation } from "./types";
+
+export const fakeLocation: GameLocation = {
+  id: -1,
+  name: "",
+  type: "HOUSE",
+};
 
 export const fakeGame: Game = {
   id: -1,
@@ -6,16 +12,12 @@ export const fakeGame: Game = {
   gameNum: -1,
   locationId: -1,
   notes: "",
-  Location: {
-    name: "",
-    type: "HOUSE",
-  },
+  Location: { ...fakeLocation },
 };
 
 export const fakePlayer: Player = {
   id: -1,
   name: "",
-  username: "",
 };
 
 export const fakeDeck: Deck = {
@@ -24,20 +26,26 @@ export const fakeDeck: Deck = {
   Player: { ...fakePlayer },
 };
 
-export type NewPlayerdeck = {
+export type NewPlayerDeck = {
   player: Player;
   deck: Deck;
 };
-
-export const emptyNewPlayerdeck: NewPlayerdeck = {
+export const emptyNewPlayerDeck: NewPlayerDeck = {
   player: { ...fakePlayer },
   deck: { ...fakeDeck },
 };
 
-export type SetNewPlayerdeckFunctionType = ({
+export type SetNewPlayerDeckFunctionType = ({
   player,
   deck,
 }: {
   player?: Player | null;
   deck?: Deck | null;
 }) => void;
+
+export type NewGamePlayerDeckError = { player: string; deck: string };
+export type NewGameErrors = {
+  location: string;
+  playerDecks: NewGamePlayerDeckError[];
+};
+export const emptyNewGamePlayerDeckError = { player: "", deck: "" };

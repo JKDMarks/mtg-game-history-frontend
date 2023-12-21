@@ -4,13 +4,13 @@ export type Game = {
   gameNum: number;
   locationId: number;
   notes: string | null;
-  Location: Location;
+  Location: GameLocation;
   GamePlayerDecks?: GamePlayerDeck[];
 };
 type LocationType = "HOUSE" | "STORE";
 
-export type Location = {
-  id?: number;
+export type GameLocation = {
+  id: number;
   name: string;
   type: LocationType;
   Games?: Game[];
@@ -19,7 +19,7 @@ export type Location = {
 export type Player = {
   id: number;
   name: string;
-  username: string;
+  username?: string;
   Decks?: Deck[];
 };
 

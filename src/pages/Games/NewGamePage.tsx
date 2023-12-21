@@ -1,6 +1,15 @@
-import { Box, FormControl, Grid, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  Button,
+  FormControl,
+  FormHelperText,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 
-import { PageWrapper } from "../../hocs";
+import { PageWrapper } from "../../components";
 import React, { useEffect, useState } from "react";
 import {
   Deck,
@@ -9,85 +18,120 @@ import {
   fetchDecks,
   fetchMostRecentGameOrCurrentPlayer,
   fetchPlayers,
-  NewPlayerdeck,
-  SetNewPlayerdeckFunctionType,
-  emptyNewPlayerdeck,
+  NewPlayerDeck,
+  SetNewPlayerDeckFunctionType,
+  emptyNewPlayerDeck,
   fakeDeck,
   fakePlayer,
+  NewGamePlayerDeckError,
+  emptyNewGamePlayerDeckError,
+  fakeLocation,
+  GameLocation,
+  fetchLocations,
+  NewGameErrors,
+  getTodaysDate,
 } from "../../helpers";
 
-import NewGameSinglePlayerdeck from "./NewGameSinglePlayerdeck";
+import NewGameSinglePlayerDeck from "./NewGameSinglePlayerDeck";
 import NewPlayerDialog from "./NewPlayerDialog";
 import NewDeckDialog from "./NewDeckDialog";
+import { useNavigate } from "react-router-dom";
 
 export default function NewGamePage() {
+  const navigate = useNavigate();
+
   const [players, setPlayers] = useState<Player[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
-  const [newPlayerdecks, setNewPlayerdecks] = useState<NewPlayerdeck[]>([
-    { ...emptyNewPlayerdeck },
-    { ...emptyNewPlayerdeck },
-    { ...emptyNewPlayerdeck },
-    { ...emptyNewPlayerdeck },
+  const [locations, setLocations] = useState<GameLocation[]>([]);
+
+  const [newPlayerDecks, setNewPlayerDecks] = useState<NewPlayerDeck[]>([
+    { ...emptyNewPlayerDeck },
+    { ...emptyNewPlayerDeck },
+    { ...emptyNewPlayerDeck },
+    { ...emptyNewPlayerDeck },
   ]);
+  const [winnerIndex, setWinnerIndex] = useState<number>(-1);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<number>>(
     new Set()
   );
   const [selectedDeckIds, setSelectedDeckIds] = useState<Set<number>>(
     new Set()
   );
+  const [newGameLocation, setNewGameLocation] = useState<GameLocation>({
+    ...fakeLocation,
+  });
 
+  const [errorMsg, setErrorMsg] = useState<string>("");
+
+  ////////////////
+  // useEffects //
+  ////////////////
   // fetch players and decks on first load
   useEffect(() => {
     fetchPlayers(setPlayers);
     fetchDecks(setDecks);
+    fetchLocations(setLocations);
   }, []);
 
   useEffect(() => {
     let shouldContinue = true;
-    for (const pd of newPlayerdecks) {
+    for (const pd of newPlayerDecks) {
       if (pd.player.id > 0 || pd.deck.id > 0) {
         shouldContinue = false;
         break;
       }
     }
-    if (shouldContinue && players.length > 0 && decks.length > 0) {
-      fetchMostRecentGameOrCurrentPlayer(setNewPlayerdecks);
+    if (newGameLocation.id > 0) {
+      shouldContinue = false;
     }
-  }, [players, decks, newPlayerdecks]);
+    if (
+      shouldContinue &&
+      players.length > 0 &&
+      decks.length > 0 &&
+      locations.length > 0
+    ) {
+      fetchMostRecentGameOrCurrentPlayer(setNewPlayerDecks, setNewGameLocation);
+    }
+  }, [players, decks, locations, newPlayerDecks, newGameLocation]);
 
   // unique player and deck ids; used to disallow multiples
   useEffect(() => {
     const tempSelectedPlayerIds = new Set<number>();
     const tempSelectedDeckIds = new Set<number>();
-    newPlayerdecks.forEach((newPlayerdeck) => {
-      tempSelectedPlayerIds.add(newPlayerdeck.player.id);
-      tempSelectedDeckIds.add(newPlayerdeck.deck.id);
+    newPlayerDecks.forEach((newPD) => {
+      tempSelectedPlayerIds.add(newPD.player.id);
+      tempSelectedDeckIds.add(newPD.deck.id);
     });
     setSelectedPlayerIds(tempSelectedPlayerIds);
     setSelectedDeckIds(tempSelectedDeckIds);
-  }, [newPlayerdecks]);
+  }, [newPlayerDecks]);
 
-  const setNthNewPlayerdeckFactory =
-    (n: number): SetNewPlayerdeckFunctionType =>
+  /////////////
+  // Helpers //
+  /////////////
+  const setNthNewPlayerDeckFactory =
+    (n: number): SetNewPlayerDeckFunctionType =>
     ({ player, deck }) => {
-      const tempNewPlayerdecks = [...newPlayerdecks];
+      const tempNewPDs = [...newPlayerDecks];
 
       if (player) {
-        tempNewPlayerdecks[n].player = player;
+        tempNewPDs[n].player = player;
       } else if (player === null) {
-        tempNewPlayerdecks[n].player = { ...fakePlayer };
+        tempNewPDs[n].player = { ...fakePlayer };
       }
 
       if (deck) {
-        tempNewPlayerdecks[n].deck = deck;
+        tempNewPDs[n].deck = deck;
       } else if (deck === null) {
-        tempNewPlayerdecks[n].deck = { ...fakeDeck };
+        tempNewPDs[n].deck = { ...fakeDeck };
       }
 
-      setNewPlayerdecks(tempNewPlayerdecks);
+      setNewPlayerDecks(tempNewPDs);
     };
 
-  // NEW PLAYER DIALOG FUNCTIONALITY
+  ///////////////////////////////////
+  // NewPlayerDialog functionality //
+  ///////////////////////////////////
   const [isNewPlayerDialogOpen, setIsNewPlayerDialogOpen] =
     useState<boolean>(false);
   const [newPlayerDialogPlayerName, setNewPlayerDialogPlayerName] =
@@ -112,14 +156,16 @@ export default function NewGamePage() {
       body: { name: newPlayerDialogPlayerName },
     });
     const newPlayer = await resp.json();
-    const tempNewPlayerdecks = { ...newPlayerdecks };
-    tempNewPlayerdecks[newPlayerDialogOpenedFromIndex].player = newPlayer;
-    setNewPlayerdecks(tempNewPlayerdecks);
+    const tempNewPDs = { ...newPlayerDecks };
+    tempNewPDs[newPlayerDialogOpenedFromIndex].player = newPlayer;
+    setNewPlayerDecks(tempNewPDs);
     fetchPlayers(setPlayers);
     handleCloseNewPlayerDialog();
   };
 
-  // NEW DECK DIALOG FUNCTIONALITY
+  /////////////////////////////////
+  // NewDeckDialog Functionality //
+  /////////////////////////////////
   const [isNewDeckDialogOpen, setIsNewDeckDialogOpen] =
     useState<boolean>(false);
   const [newDeckDialogPlayer, setNewDeckDialogPlayer] = useState<Player>({
@@ -148,10 +194,83 @@ export default function NewGamePage() {
   };
   const handleSubmitNewDeckDialog = async (e: React.FormEvent) => {
     e.preventDefault();
+    const resp = await callAPI("/decks", {
+      method: "POST",
+      body: {
+        playerId: newDeckDialogPlayer.id,
+        name: newDeckDialogDeckName,
+      },
+    });
+    const newDeck: Deck = await resp.json();
+    const tempNewPDs = { ...newPlayerDecks };
+    tempNewPDs[newDeckDialogOpenedFromIndex].deck = newDeck;
+    fetchDecks(setDecks);
+    handleCloseNewDeckDialog();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  /////////////////////
+  // Submit New Game //
+  /////////////////////
+  const getEmptyErrors = (): NewGameErrors => {
+    const tempPDErrors: NewGamePlayerDeckError[] = new Array(
+      newPlayerDecks.length
+    )
+      .fill(0)
+      .map(() => ({ ...emptyNewGamePlayerDeckError }));
+
+    return {
+      location: "",
+      playerDecks: tempPDErrors,
+    };
+  };
+
+  const [errors, setErrors] = useState<NewGameErrors>(getEmptyErrors());
+
+  const handleSubmitNewGame = async (e: React.FormEvent) => {
     e.preventDefault();
+    const tempErrors = getEmptyErrors();
+    let dontContinue = false;
+    for (const [i, pd] of newPlayerDecks.entries()) {
+      if (pd.player.id < 0) {
+        tempErrors.playerDecks[i].player = "No player selected";
+        dontContinue = true;
+      } else if (pd.deck.id < 0) {
+        tempErrors.playerDecks[i].deck = "No deck selected";
+        dontContinue = true;
+      }
+    }
+    if (newGameLocation.id < 0) {
+      tempErrors.location = "No location selected";
+    }
+    setErrors(tempErrors);
+    if (dontContinue) {
+      return;
+    }
+
+    // CHANGEME: ALERT IF NO WINNER
+    const x = confirm("hi");
+    console.log(x);
+    return;
+
+    const body = {
+      locationId: newGameLocation.id,
+      date: getTodaysDate(),
+      playerDecks: newPlayerDecks.map((pd, i) => ({
+        playerId: pd.player.id,
+        deckId: pd.deck.id,
+        isWinner: winnerIndex === i,
+      })),
+    };
+    const resp = await callAPI("/games", {
+      method: "POST",
+      body,
+    });
+    const newGame = await resp.json();
+    if (newGame.id) {
+      navigate(`/games/${newGame.id}`);
+    } else {
+      setErrorMsg(newGame.message);
+    }
   };
 
   return (
@@ -164,23 +283,67 @@ export default function NewGamePage() {
         >
           Create New Game
         </Typography>
-        <FormControl component="form" onSubmit={handleSubmit}>
-          <Grid container spacing={2} columns={{ xs: 1, md: 2, lg: 4 }}>
-            {newPlayerdecks.map((newPlayerdeck, i) => (
-              <NewGameSinglePlayerdeck
-                index={i}
-                key={`player-${i}`}
-                newPlayerdeck={newPlayerdeck}
-                setNewPlayerdeck={setNthNewPlayerdeckFactory(i)}
-                players={players}
-                decks={decks}
-                selectedPlayerIds={selectedPlayerIds}
-                selectedDeckIds={selectedDeckIds}
-                openNewPlayerDialog={handleOpenNewPlayerDialog}
-                openNewDeckDialog={handleOpenNewDeckDialog}
-              />
-            ))}
-          </Grid>
+        <FormControl component="form" onSubmit={handleSubmitNewGame}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+            className="space-y-4"
+          >
+            <Grid container spacing={4} columns={{ xs: 1, md: 2, lg: 4 }}>
+              {newPlayerDecks.map((newPlayerDeck, i) => (
+                <NewGameSinglePlayerDeck
+                  index={i}
+                  key={`player-${i}`}
+                  newPlayerDeck={newPlayerDeck}
+                  setNewPlayerDeck={setNthNewPlayerDeckFactory(i)}
+                  players={players}
+                  decks={decks}
+                  isWinner={winnerIndex === i}
+                  setWinnerIndex={setWinnerIndex}
+                  selectedPlayerIds={selectedPlayerIds}
+                  selectedDeckIds={selectedDeckIds}
+                  openNewPlayerDialog={handleOpenNewPlayerDialog}
+                  openNewDeckDialog={handleOpenNewDeckDialog}
+                  errors={errors}
+                />
+              ))}
+            </Grid>
+            <Box>Location</Box>
+            <Autocomplete
+              id="new-location"
+              disableClearable
+              sx={{ minWidth: "300px" }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Location"
+                  error={!!errors.location}
+                />
+              )}
+              options={locations}
+              isOptionEqualToValue={(location, value) =>
+                location.id === value.id
+              }
+              getOptionLabel={(location) => location.name}
+              value={newGameLocation}
+              onChange={(_, location) => setNewGameLocation(location)}
+            />
+            {errorMsg && <FormHelperText error>{errorMsg}</FormHelperText>}
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                // marginTop: "2rem",
+                paddingX: "2rem",
+                letterSpacing: "0.125rem",
+              }}
+            >
+              Submit New Game
+            </Button>
+          </Box>
         </FormControl>
       </Box>
       <NewPlayerDialog

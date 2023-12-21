@@ -26,10 +26,10 @@ export default function NewPlayerDialog({
 }: NewPlayerDialogProps) {
   const [errorMsg, setErrorMsg] = useState<string>("");
 
-  const checkErrorsAndClose = (e: React.FormEvent) => {
+  const checkErrorsAndSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setErrorMsg("");
     const nameRgx = /^[a-z ,.'-]+$/i;
-    e.preventDefault();
     if (!newPlayerName) {
       setErrorMsg("Name can't be empty");
       return;
@@ -47,15 +47,15 @@ export default function NewPlayerDialog({
 
   return (
     <Dialog open={open} onClose={resetErrorsAndClose} maxWidth="xs">
-      <form onSubmit={(e) => checkErrorsAndClose(e)}>
+      <form onSubmit={(e) => checkErrorsAndSubmit(e)}>
         <DialogTitle>Add a new player</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please add the player's last name or last initial! thx {"<3"}
+            Remember to add the player's last name or last initial!
           </DialogContentText>
           <TextField
             autoFocus
-            id="name"
+            id="new-player-dialog-new-name"
             value={newPlayerName}
             onChange={(event) => setNewPlayerName(event.target.value)}
             label="name"
