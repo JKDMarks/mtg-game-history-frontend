@@ -21,7 +21,7 @@ type NewGameSinglePlayerDeckProps = {
   index: number;
   newPlayerDeck: NewPlayerDeck;
   isWinner: boolean;
-  setWinnerIndex: (index: number) => void;
+  handleChangeIsWinnerSwitch: (checked: boolean) => void;
   selectedPlayerIds: Set<number>;
   selectedDeckIds: Set<number>;
   players: Player[];
@@ -41,7 +41,7 @@ export default function NewGameSinglePlayerDeck({
   index,
   newPlayerDeck,
   isWinner,
-  setWinnerIndex,
+  handleChangeIsWinnerSwitch,
   selectedPlayerIds,
   selectedDeckIds,
   players,
@@ -71,13 +71,7 @@ export default function NewGameSinglePlayerDeck({
           <Box>Winner</Box>
           <Switch
             checked={isWinner}
-            onChange={(e) => {
-              if (e.target.checked) {
-                setWinnerIndex(index);
-              } else {
-                setWinnerIndex(-1);
-              }
-            }}
+            onChange={(_, checked) => handleChangeIsWinnerSwitch(checked)}
           />
         </Box>
       </Box>

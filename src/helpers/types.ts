@@ -7,12 +7,13 @@ export type Game = {
   Location: GameLocation;
   GamePlayerDecks?: GamePlayerDeck[];
 };
-type LocationType = "HOUSE" | "STORE";
+// type LocationType = "HOUSE" | "STORE";
 
 export type GameLocation = {
   id: number;
   name: string;
-  type: LocationType;
+  isPublic: boolean;
+  // type: LocationType;
   Games?: Game[];
 };
 

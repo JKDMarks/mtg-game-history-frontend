@@ -156,7 +156,7 @@ export default function NewGamePage() {
       body: { name: newPlayerDialogPlayerName },
     });
     const newPlayer = await resp.json();
-    const tempNewPDs = { ...newPlayerDecks };
+    const tempNewPDs = [...newPlayerDecks];
     tempNewPDs[newPlayerDialogOpenedFromIndex].player = newPlayer;
     setNewPlayerDecks(tempNewPDs);
     fetchPlayers(setPlayers);
@@ -202,7 +202,7 @@ export default function NewGamePage() {
       },
     });
     const newDeck: Deck = await resp.json();
-    const tempNewPDs = { ...newPlayerDecks };
+    const tempNewPDs = [...newPlayerDecks];
     tempNewPDs[newDeckDialogOpenedFromIndex].deck = newDeck;
     fetchDecks(setDecks);
     handleCloseNewDeckDialog();
@@ -241,6 +241,7 @@ export default function NewGamePage() {
     }
     if (newGameLocation.id < 0) {
       tempErrors.location = "No location selected";
+      dontContinue = true;
     }
     setErrors(tempErrors);
     if (dontContinue) {
@@ -248,9 +249,12 @@ export default function NewGamePage() {
     }
 
     // CHANGEME: ALERT IF NO WINNER
-    const x = confirm("hi");
-    console.log(x);
-    return;
+    if (winnerIndex < 0) {
+      const shouldSubmit = confirm("Submit this game with no winner?");
+      if (!shouldSubmit) {
+        return;
+      }
+    }
 
     const body = {
       locationId: newGameLocation.id,
@@ -293,23 +297,27 @@ export default function NewGamePage() {
             className="space-y-4"
           >
             <Grid container spacing={4} columns={{ xs: 1, md: 2, lg: 4 }}>
-              {newPlayerDecks.map((newPlayerDeck, i) => (
-                <NewGameSinglePlayerDeck
-                  index={i}
-                  key={`player-${i}`}
-                  newPlayerDeck={newPlayerDeck}
-                  setNewPlayerDeck={setNthNewPlayerDeckFactory(i)}
-                  players={players}
-                  decks={decks}
-                  isWinner={winnerIndex === i}
-                  setWinnerIndex={setWinnerIndex}
-                  selectedPlayerIds={selectedPlayerIds}
-                  selectedDeckIds={selectedDeckIds}
-                  openNewPlayerDialog={handleOpenNewPlayerDialog}
-                  openNewDeckDialog={handleOpenNewDeckDialog}
-                  errors={errors}
-                />
-              ))}
+              {newPlayerDecks.map((newPlayerDeck, i) => {
+                return (
+                  <NewGameSinglePlayerDeck
+                    index={i}
+                    key={`player-${i}`}
+                    newPlayerDeck={newPlayerDeck}
+                    setNewPlayerDeck={setNthNewPlayerDeckFactory(i)}
+                    players={players}
+                    decks={decks}
+                    isWinner={winnerIndex === i}
+                    handleChangeIsWinnerSwitch={(checked) =>
+                      setWinnerIndex(checked ? i : -1)
+                    }
+                    selectedPlayerIds={selectedPlayerIds}
+                    selectedDeckIds={selectedDeckIds}
+                    openNewPlayerDialog={handleOpenNewPlayerDialog}
+                    openNewDeckDialog={handleOpenNewDeckDialog}
+                    errors={errors}
+                  />
+                );
+              })}
             </Grid>
             <Box>Location</Box>
             <Autocomplete

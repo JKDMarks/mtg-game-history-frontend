@@ -39,7 +39,7 @@ export const fetchMostRecentGameOrCurrentPlayer = async (
   if (
     mostRecentGame &&
     // CHANGEME: undo this comment
-    // mostRecentGame.date === getTodaysDate() &&
+    mostRecentGame.date === getTodaysDate() &&
     mostRecentGame.GamePlayerDecks
   ) {
     const tempNewPlayerDecks = mostRecentGame.GamePlayerDecks.map(

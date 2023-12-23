@@ -3,7 +3,7 @@ import { Deck, Game, Player, GameLocation } from "./types";
 export const fakeLocation: GameLocation = {
   id: -1,
   name: "",
-  type: "HOUSE",
+  isPublic: true,
 };
 
 export const fakeGame: Game = {
