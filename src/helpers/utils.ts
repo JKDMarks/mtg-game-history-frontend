@@ -1,6 +1,18 @@
 import moment from "moment";
-import { Deck, Game, GameLocation, Player } from "./types";
+import { Deck, Game, GameLocation, Player, USER_LEVEL } from "./types";
 import { NewPlayerDeck, emptyNewPlayerDeck, fakeDeck } from "./constants";
+
+export const canCurrPlayerViewGame = (currPlayer: Player, game: Game) => {
+  const currPlayerIsAdmin =
+    currPlayer.userLevel !== undefined &&
+    currPlayer.userLevel >= USER_LEVEL.ADMIN;
+
+  const getIsCurrPlayerInGame = () =>
+    !!game.GamePlayerDecks &&
+    !!game.GamePlayerDecks.find((gpd) => gpd.Player.id === currPlayer.id);
+
+  return currPlayerIsAdmin || game.Location.isPublic || getIsCurrPlayerInGame();
+};
 
 export type HTTPMethod = "GET" | "POST";
 
@@ -34,7 +46,6 @@ export const fetchMostRecentGameOrCurrentPlayer = async (
 ) => {
   const resp = await callAPI("/games/recent");
   const mostRecentGame: Game = await resp.json();
-  console.log("***mostRecentGame", mostRecentGame);
 
   if (
     mostRecentGame &&

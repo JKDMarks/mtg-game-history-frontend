@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { callAPI } from "../../helpers";
+import { Divider } from "../../components";
 
 type AuthForm = "LOGIN" | "SIGNUP";
 
@@ -58,7 +59,7 @@ export default function GenericAuthForm({ type }: { type: AuthForm }) {
         <Box className="text-xl font-bold">
           {type === "LOGIN" ? "Login" : "Signup"}
         </Box>
-        <Box sx={{ width: "100%", borderBottom: "1px solid black" }}></Box>
+        <Divider />
         <FormControl
           component="form"
           className="space-y-2"

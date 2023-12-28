@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { PageWrapper } from "../../components";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Link, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Game, fakeGame, callAPI } from "../../helpers";
 
@@ -32,18 +32,22 @@ export default function NewGamePage() {
               {game.Location?.name} on {game.date}, game #{game.gameNum}
             </Typography>
             <Grid container spacing={2} columns={{ xs: 1, md: 2, lg: 4 }}>
-              {game.GamePlayerDecks?.map((gpd) => {
+              {game.GamePlayerDecks?.map((gpd, gpdIdx) => {
                 const player = gpd.Player;
                 const deck = gpd.Deck;
                 const didPlayOwnDeck = player.id === deck.Player?.id;
                 return (
-                  <Grid item xs={1} md={1} lg={1}>
+                  <Grid key={gpdIdx} item xs={1} md={1} lg={1}>
                     {gpd.isWinner && "⭐"}
-                    {gpd.Player.name}
+                    <Link href={`/players/${player.id}`}>
+                      {gpd.Player.name}
+                    </Link>
                     {gpd.isWinner && "⭐"}
                     <br />
-                    {!didPlayOwnDeck && `${gpd.Deck.Player.name}'s `}
-                    {gpd.Deck.name}
+                    <Link href={`/decks/${deck.id}`}>
+                      {!didPlayOwnDeck && `${gpd.Deck.Player.name}'s `}
+                      {gpd.Deck.name}
+                    </Link>
                   </Grid>
                 );
               })}

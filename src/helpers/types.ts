@@ -17,10 +17,18 @@ export type GameLocation = {
   Games?: Game[];
 };
 
+export enum USER_LEVEL {
+  BANNED = 0,
+  RESTRICTED = 1,
+  REGULAR_USER = 2,
+  ADMIN = 9,
+}
+
 export type Player = {
   id: number;
   name: string;
   username?: string;
+  userLevel?: number;
   Decks?: Deck[];
 };
 
