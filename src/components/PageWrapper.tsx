@@ -2,15 +2,25 @@ import {
   AppBar,
   Box,
   Container,
+  IconButton,
+  Menu,
+  MenuItem,
   Toolbar,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link, useRouteLoaderData } from "react-router-dom";
+import { Link, useNavigate, useRouteLoaderData } from "react-router-dom";
 import { Player, callAPI } from "../helpers";
 import { ROOT_ROUTE_ID } from "../App";
+import { useState } from "react";
+
+const appBarPages = [
+  { label: "Create New Game", link: "/games/new" },
+  { label: "Players", link: "/players" },
+  // { label: "Decks", link: "/decks" },
+];
 
 export default function PageWrapper({
   children,
@@ -18,29 +28,90 @@ export default function PageWrapper({
   children: JSX.Element | JSX.Element[];
 }) {
   const currPlayer = useRouteLoaderData(ROOT_ROUTE_ID) as Player;
+  const navigate = useNavigate();
 
   const theme = useTheme();
   const isMdOrLarger = useMediaQuery(theme.breakpoints.up("md"));
+
+  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNav(event.currentTarget);
+  };
+
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
 
   return (
     <Box className="min-h-screen flex flex-col">
       <AppBar position="static" className="self-start">
         <Container maxWidth="xl">
-          <Toolbar disableGutters>
-            <Typography
-              variant={isMdOrLarger ? "h6" : "body1"}
-              component={Link}
+          <Toolbar disableGutters className="flex flex-row items-center">
+            {isMdOrLarger ? null : (
+              <>
+                <IconButton
+                  size="large"
+                  // aria-label="navigate actions"
+                  // aria-controls="menu-appbar"
+                  // aria-haspopup="true"
+                  onClick={handleOpenNavMenu}
+                  color="inherit"
+                  sx={{ padding: "0", marginRight: "0.5rem" }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorElNav}
+                  // anchorOrigin={{
+                  //   vertical: "bottom",
+                  //   horizontal: "left",
+                  // }}
+                  // keepMounted
+                  // transformOrigin={{
+                  //   vertical: "top",
+                  //   horizontal: "left",
+                  // }}
+                  open={Boolean(anchorElNav)}
+                  onClose={handleCloseNavMenu}
+                  // sx={{
+                  //   display: { xs: "block", md: "none" },
+                  // }}
+                >
+                  {appBarPages.map((page, i) => (
+                    <MenuItem key={i} onClick={() => navigate(page.link)}>
+                      <Typography textAlign="center">{page.label}</Typography>
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </>
+            )}
+            <Link
+              // variant={isMdOrLarger ? "h6" : "body1"}
+              // component={Link}
+              className="text-xl"
               to="/"
             >
               MTG Game History
-            </Typography>
+            </Link>
+            {isMdOrLarger ? (
+              <>
+                {appBarPages.map((page, i) => (
+                  <Link key={i} to={page.link} className="ml-7">
+                    {page.label.toUpperCase()}
+                  </Link>
+                ))}
+              </>
+            ) : null}
             <Box sx={{ flexGrow: 1 }}></Box>
-            <Box sx={{ flexGrow: 0 }} className="flex flex-row space-x-10">
+            <Box
+              sx={{ flexGrow: 0 }}
+              className="flex flex-row space-x-10 align-center"
+            >
               {isMdOrLarger ? (
-                <Link to="/players/me">{currPlayer.name}</Link>
-              ) : (
-                <MenuIcon />
-              )}
+                <Link to={`/players/${currPlayer.id}`}>{currPlayer.name}</Link>
+              ) : null}
               <Link
                 to="/login"
                 onClick={() => callAPI("/auth/logout")}

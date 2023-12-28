@@ -1,33 +1,29 @@
-import { useParams, useRouteLoaderData } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Divider, PageWrapper, GamesGrid } from "../../components";
 import { Grid, Link, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Game, Player, callAPI, fakePlayer } from "../../helpers";
-import { ROOT_ROUTE_ID } from "../../App";
 
-export default function PlayerPage({ me }: { me?: boolean }) {
+export default function SinglePlayerPage() {
   const { playerId } = useParams();
-  const currPlayer = useRouteLoaderData(ROOT_ROUTE_ID) as Player;
 
   const [games, setGames] = useState<Game[]>([]);
   const [player, setPlayer] = useState<Player>({ ...fakePlayer });
 
   useEffect(() => {
     const fetchPlayer = async () => {
-      const resp = await callAPI(`/players/${me ? currPlayer.id : playerId}`);
+      const resp = await callAPI(`/players/${playerId}`);
       const player = await resp.json();
       setPlayer(player);
     };
     const fetchGames = async () => {
-      const resp = await callAPI(
-        `/games/player/${me ? currPlayer.id : playerId}`
-      );
+      const resp = await callAPI(`/games/player/${playerId}`);
       const games = await resp.json();
       setGames(games);
     };
     fetchPlayer();
     fetchGames();
-  }, [me, currPlayer, playerId]);
+  }, [playerId]);
 
   return (
     <PageWrapper>
@@ -65,7 +61,7 @@ export default function PlayerPage({ me }: { me?: boolean }) {
               <Divider margins />
             </>
           )}
-          <GamesGrid games={games} />
+          <GamesGrid games={games} shouldShowPrivateGames />
         </>
       ) : (
         <></>

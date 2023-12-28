@@ -13,12 +13,15 @@ import {
   LoginPage,
   NewGamePage,
   NotFoundPage,
+  PlayersPage,
   SignupPage,
+  SinglePlayerPage,
 } from "./pages";
 import { callAPI, getURLPathnameFromRequest } from "./helpers";
-import { PlayerPage } from "./pages/Players";
 
 export const ROOT_ROUTE_ID = "root";
+
+const redirectHome = () => redirect("/");
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -43,14 +46,16 @@ const router = createBrowserRouter(
       <Route path="login" element={<LoginPage />} />
       <Route path="signup" element={<SignupPage />} />
       <Route path="games">
+        <Route index loader={redirectHome} />
         <Route path="new" element={<NewGamePage />} />
         <Route path=":gameId" element={<GamePage />} />
       </Route>
       <Route path="players">
-        <Route path="me" element={<PlayerPage me />} />
-        <Route path=":playerId" element={<PlayerPage />} />
+        <Route index element={<PlayersPage />} />
+        <Route path=":playerId" element={<SinglePlayerPage />} />
       </Route>
       <Route path="decks">
+        <Route index loader={redirectHome} />
         <Route path=":deckId" element={<DeckPage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />

@@ -6,7 +6,13 @@ import { Game, Player, canCurrPlayerViewGame } from "../helpers";
 import { Fragment } from "react";
 import { ROOT_ROUTE_ID } from "../App";
 
-export default function GamesGrid({ games }: { games: Game[] }) {
+export default function GamesGrid({
+  games,
+  shouldShowPrivateGames = false,
+}: {
+  games: Game[];
+  shouldShowPrivateGames?: boolean;
+}) {
   const navigate = useNavigate();
   const currPlayer = useRouteLoaderData(ROOT_ROUTE_ID) as Player;
 
@@ -19,7 +25,7 @@ export default function GamesGrid({ games }: { games: Game[] }) {
     >
       {games.map((game, idx) => {
         if (!canCurrPlayerViewGame(currPlayer, game)) {
-          return (
+          return shouldShowPrivateGames ? (
             <Grid item key={idx} xs={1}>
               <Button
                 disabled
@@ -36,7 +42,7 @@ export default function GamesGrid({ games }: { games: Game[] }) {
                 Private game
               </Button>
             </Grid>
-          );
+          ) : null;
         }
 
         return (
@@ -59,7 +65,7 @@ export default function GamesGrid({ games }: { games: Game[] }) {
               onClick={() => navigate(`/games/${game.id}`)}
             >
               <Box>
-                {game.Location?.name} on {game.date}
+                {game.Location?.name} <br /> {game.date}
                 <br />
                 Game #{game.gameNum}
               </Box>

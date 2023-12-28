@@ -35,7 +35,7 @@ export default function DeckPage() {
           <Typography className="text-gray-600" sx={{ marginBottom: "0.5rem" }}>
             Played in {games.length} games
           </Typography>
-          <GamesGrid games={games} />
+          <GamesGrid games={games} shouldShowPrivateGames />
         </>
       ) : (
         <></>
