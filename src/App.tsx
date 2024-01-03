@@ -35,11 +35,9 @@ const router = createBrowserRouter(
           if (resp.status !== 200) {
             return redirect("/login");
           }
-          const resp2 = await callAPI("/players/me");
-          return await resp2.json();
         }
-
-        return null;
+        const resp2 = await callAPI("/players/me");
+        return await resp2.json();
       }}
     >
       <Route path="" element={<HomePage />} />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
 import { callAPI, Game } from "../../helpers";
 import { PageWrapper, GamesGrid } from "../../components";
@@ -42,6 +42,9 @@ function HomePage() {
             Create New Game
           </Button>
         </Box>
+        <Typography variant="h5" className="underline mb-0">
+          Most Recent Games
+        </Typography>
         <GamesGrid games={games} />
       </Box>
     </PageWrapper>

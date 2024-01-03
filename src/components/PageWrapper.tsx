@@ -52,9 +52,6 @@ export default function PageWrapper({
               <>
                 <IconButton
                   size="large"
-                  // aria-label="navigate actions"
-                  // aria-controls="menu-appbar"
-                  // aria-haspopup="true"
                   onClick={handleOpenNavMenu}
                   color="inherit"
                   sx={{ padding: "0", marginRight: "0.5rem" }}
@@ -64,22 +61,16 @@ export default function PageWrapper({
                 <Menu
                   id="menu-appbar"
                   anchorEl={anchorElNav}
-                  // anchorOrigin={{
-                  //   vertical: "bottom",
-                  //   horizontal: "left",
-                  // }}
-                  // keepMounted
-                  // transformOrigin={{
-                  //   vertical: "top",
-                  //   horizontal: "left",
-                  // }}
                   open={Boolean(anchorElNav)}
                   onClose={handleCloseNavMenu}
-                  // sx={{
-                  //   display: { xs: "block", md: "none" },
-                  // }}
                 >
-                  {appBarPages.map((page, i) => (
+                  {[
+                    ...appBarPages,
+                    {
+                      label: "My Profile",
+                      link: `/players/${currPlayer.id}`,
+                    },
+                  ].map((page, i) => (
                     <MenuItem key={i} onClick={() => navigate(page.link)}>
                       <Typography textAlign="center">{page.label}</Typography>
                     </MenuItem>
@@ -87,12 +78,7 @@ export default function PageWrapper({
                 </Menu>
               </>
             )}
-            <Link
-              // variant={isMdOrLarger ? "h6" : "body1"}
-              // component={Link}
-              className="text-xl font-bold"
-              to="/"
-            >
+            <Link className="text-xl font-bold" to="/">
               MTG Game History
             </Link>
             {isMdOrLarger ? (
@@ -133,7 +119,6 @@ export default function PageWrapper({
         }}
       >
         <Box
-          //   className="flex flex-col items-center space-y-3 py-3"
           className="p-3"
           sx={{
             width: { xs: 300, sm: 550, md: 850, lg: 1100 },

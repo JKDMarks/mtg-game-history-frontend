@@ -39,7 +39,9 @@ export default function GenericAuthForm({ type }: { type: AuthForm }) {
     const respJson = await resp.json();
 
     if (respJson.loggedIn === true) {
-      navigate("/");
+      // navigate twice to force refresh root route loader
+      navigate("/", { replace: true });
+      navigate("/", { replace: true });
     } else {
       setErrorMsg(respJson.message);
     }
