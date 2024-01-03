@@ -27,7 +27,7 @@ export default function DeckPage() {
 
   return (
     <PageWrapper>
-      {deck.id > 0 && games.length ? (
+      {deck.id > 0 ? (
         <>
           <Typography variant="h5" className="underline">
             {deck.Player.name}'s {deck.name}

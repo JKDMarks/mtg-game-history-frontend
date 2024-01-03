@@ -248,7 +248,6 @@ export default function NewGamePage() {
       return;
     }
 
-    // CHANGEME: ALERT IF NO WINNER
     if (winnerIndex < 0) {
       const shouldSubmit = confirm("Submit this game with no winner?");
       if (!shouldSubmit) {
@@ -322,7 +321,8 @@ export default function NewGamePage() {
             <Box>Location</Box>
             <Autocomplete
               id="new-location"
-              disableClearable
+              // disableClearable
+              clearIcon={null}
               sx={{ minWidth: "300px" }}
               renderInput={(params) => (
                 <TextField
@@ -336,8 +336,10 @@ export default function NewGamePage() {
                 location.id === value.id
               }
               getOptionLabel={(location) => location.name}
-              value={newGameLocation}
-              onChange={(_, location) => setNewGameLocation(location)}
+              value={newGameLocation.id > 0 ? newGameLocation : null}
+              onChange={(_, location) =>
+                location && setNewGameLocation(location)
+              }
             />
             {errorMsg && <FormHelperText error>{errorMsg}</FormHelperText>}
             <Button

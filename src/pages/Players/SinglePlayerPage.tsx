@@ -1,11 +1,13 @@
-import { useParams } from "react-router-dom";
+import { useParams, useRouteLoaderData } from "react-router-dom";
 import { Divider, PageWrapper, GamesGrid } from "../../components";
-import { Grid, Link, Typography } from "@mui/material";
+import { Button, Grid, Link, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Game, Player, callAPI, fakePlayer } from "../../helpers";
+import { ROOT_ROUTE_ID } from "../../App";
 
 export default function SinglePlayerPage() {
   const { playerId } = useParams();
+  const currPlayer = useRouteLoaderData(ROOT_ROUTE_ID) as Player;
 
   const [games, setGames] = useState<Game[]>([]);
   const [player, setPlayer] = useState<Player>({ ...fakePlayer });
@@ -27,7 +29,7 @@ export default function SinglePlayerPage() {
 
   return (
     <PageWrapper>
-      {player.id > 0 && games.length > 0 ? (
+      {player.id > 0 ? (
         <>
           <Typography variant="h5" className="underline">
             {player.name}
@@ -35,9 +37,15 @@ export default function SinglePlayerPage() {
           <Typography className="text-gray-600">
             Played in {games.length} games
           </Typography>
-          <Divider margins />
+          {
+            // TODO: Edit profile page
+            false && currPlayer.id === player.id && (
+              <Button variant="contained">Edit Profile</Button>
+            )
+          }
           {!!player.Decks?.length && (
             <>
+              <Divider margins />
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                 Decks
               </Typography>
@@ -52,16 +60,20 @@ export default function SinglePlayerPage() {
                   marginTop: "-8px",
                 }}
               >
-                {player.Decks.map(({ id, name }) => (
-                  <Grid item xs={1}>
+                {player.Decks.map(({ id, name }, i) => (
+                  <Grid item key={i} xs={1}>
                     <Link href={`/decks/${id}`}>{name}</Link>
                   </Grid>
                 ))}
               </Grid>
-              <Divider margins />
             </>
           )}
-          <GamesGrid games={games} shouldShowPrivateGames />
+          {games.length > 0 && (
+            <>
+              <Divider margins />
+              <GamesGrid games={games} shouldShowPrivateGames />
+            </>
+          )}
         </>
       ) : (
         <></>

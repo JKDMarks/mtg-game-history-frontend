@@ -90,7 +90,7 @@ export default function PageWrapper({
             <Link
               // variant={isMdOrLarger ? "h6" : "body1"}
               // component={Link}
-              className="text-xl"
+              className="text-xl font-bold"
               to="/"
             >
               MTG Game History
@@ -98,7 +98,7 @@ export default function PageWrapper({
             {isMdOrLarger ? (
               <>
                 {appBarPages.map((page, i) => (
-                  <Link key={i} to={page.link} className="ml-7">
+                  <Link key={i} to={page.link} className="ml-7 tracking-wider">
                     {page.label.toUpperCase()}
                   </Link>
                 ))}

@@ -49,7 +49,6 @@ export const fetchMostRecentGameOrCurrentPlayer = async (
 
   if (
     mostRecentGame &&
-    // CHANGEME: undo this comment
     mostRecentGame.date === getTodaysDate() &&
     mostRecentGame.GamePlayerDecks
   ) {

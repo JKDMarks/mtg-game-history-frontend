@@ -1,11 +1,21 @@
-import { useParams } from "react-router-dom";
-import { PageWrapper } from "../../components";
+import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
 import { Box, Grid, Link, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Game, fakeGame, callAPI } from "../../helpers";
+import {
+  Game,
+  fakeGame,
+  callAPI,
+  canCurrPlayerViewGame,
+  Player,
+} from "../../helpers";
+
+import { PageWrapper } from "../../components";
+import { ROOT_ROUTE_ID } from "../../App";
 
 export default function NewGamePage() {
   const { gameId } = useParams();
+  const currPlayer = useRouteLoaderData(ROOT_ROUTE_ID) as Player;
+  const navigate = useNavigate();
 
   const [game, setGame] = useState<Game>(fakeGame);
 
@@ -18,6 +28,12 @@ export default function NewGamePage() {
 
     fetchData();
   }, [gameId]);
+
+  useEffect(() => {
+    if (!canCurrPlayerViewGame(currPlayer, game)) {
+      navigate("/");
+    }
+  }, [currPlayer, navigate, game]);
 
   return (
     <PageWrapper>
