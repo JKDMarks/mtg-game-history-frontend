@@ -7,21 +7,19 @@ import {
 } from "react-router-dom";
 
 import {
-  DeckPage,
+  AllGamesPage,
   GamePage,
   HomePage,
   LoginPage,
   NewGamePage,
   NotFoundPage,
-  PlayersPage,
   SignupPage,
-  SinglePlayerPage,
 } from "./pages";
 import { callAPI, getURLPathnameFromRequest } from "./helpers";
 
 export const ROOT_ROUTE_ID = "root";
 
-const redirectHome = () => redirect("/");
+// const redirectHome = () => redirect("/");
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -36,7 +34,7 @@ const router = createBrowserRouter(
             return redirect("/login");
           }
         }
-        const resp2 = await callAPI("/players/me");
+        const resp2 = await callAPI("/me");
         return await resp2.json();
       }}
     >
@@ -44,18 +42,18 @@ const router = createBrowserRouter(
       <Route path="login" element={<LoginPage />} />
       <Route path="signup" element={<SignupPage />} />
       <Route path="games">
-        <Route index loader={redirectHome} />
+        <Route index element={<AllGamesPage />} />
         <Route path="new" element={<NewGamePage />} />
         <Route path=":gameId" element={<GamePage />} />
       </Route>
-      <Route path="players">
+      {/* <Route path="players">
         <Route index element={<PlayersPage />} />
         <Route path=":playerId" element={<SinglePlayerPage />} />
       </Route>
       <Route path="decks">
         <Route index loader={redirectHome} />
         <Route path=":deckId" element={<DeckPage />} />
-      </Route>
+      </Route> */}
       <Route path="*" element={<NotFoundPage />} />
     </Route>
   )

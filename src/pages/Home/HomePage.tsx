@@ -13,7 +13,9 @@ function HomePage() {
       const resp = await callAPI("/games");
       const games: Game[] = await resp.json();
       // newest first
-      setGames([...games].sort((gameA, gameB) => gameB.id - gameA.id));
+      setGames(
+        [...games].sort((gameA, gameB) => gameB.id - gameA.id).slice(0, 8)
+      );
     };
 
     fetchGames();

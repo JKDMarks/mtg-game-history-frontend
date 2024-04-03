@@ -1,17 +1,13 @@
 import moment from "moment";
-import { Deck, Game, GameLocation, Player, USER_LEVEL } from "./types";
-import { NewPlayerDeck, emptyNewPlayerDeck, fakeDeck } from "./constants";
+import { Deck, Game, Player, User, USER_LEVEL } from "./types";
+import { NewPlayerDeck } from "./constants";
 
-export const canCurrPlayerViewGame = (currPlayer: Player, game: Game) => {
+export const canCurrUserViewGame = (currUser: User, game: Game) => {
   const currPlayerIsAdmin =
-    currPlayer.userLevel !== undefined &&
-    currPlayer.userLevel >= USER_LEVEL.ADMIN;
+    currUser.user_level !== undefined &&
+    currUser.user_level >= USER_LEVEL.ADMIN;
 
-  const getIsCurrPlayerInGame = () =>
-    !!game.GamePlayerDecks &&
-    !!game.GamePlayerDecks.find((gpd) => gpd.Player.id === currPlayer.id);
-
-  return currPlayerIsAdmin || game.Location.isPublic || getIsCurrPlayerInGame();
+  return currPlayerIsAdmin || game.user_id === currUser.id;
 };
 
 export type HTTPMethod = "GET" | "POST";
@@ -40,9 +36,8 @@ export const getURLPathnameFromRequest = (request: Request) =>
 
 export const getTodaysDate = () => moment().format("YYYY-MM-DD");
 
-export const fetchMostRecentGameOrCurrentPlayer = async (
-  setNewPlayerDecks: (newPlayerDecks: NewPlayerDeck[]) => void,
-  setLocation: (location: GameLocation) => void
+export const fetchMostRecentGame = async (
+  setNewPlayerDecks: (newPlayerDecks: NewPlayerDeck[]) => void
 ) => {
   const resp = await callAPI("/games/recent");
   const mostRecentGame: Game = await resp.json();
@@ -50,25 +45,11 @@ export const fetchMostRecentGameOrCurrentPlayer = async (
   if (
     mostRecentGame &&
     mostRecentGame.date === getTodaysDate() &&
-    mostRecentGame.GamePlayerDecks
+    mostRecentGame.game_player_decks
   ) {
-    const tempNewPlayerDecks = mostRecentGame.GamePlayerDecks.map(
-      ({ Player, Deck }) => ({
-        player: Player,
-        deck: Deck,
-      })
+    const tempNewPlayerDecks = mostRecentGame.game_player_decks.map(
+      ({ player, deck }) => ({ player, deck })
     );
-    setNewPlayerDecks(tempNewPlayerDecks);
-    setLocation({ ...mostRecentGame.Location });
-  } else {
-    const resp2 = await callAPI("/players/me");
-    const me: Player = await resp2.json();
-    const tempNewPlayerDecks: NewPlayerDeck[] = [
-      { player: me, deck: { ...fakeDeck } },
-      { ...emptyNewPlayerDeck },
-      { ...emptyNewPlayerDeck },
-      { ...emptyNewPlayerDeck },
-    ];
     setNewPlayerDecks(tempNewPlayerDecks);
   }
 };
@@ -86,18 +67,13 @@ export const fetchDecks = async (setDecks: (decks: Deck[]) => void) => {
   const resp = await callAPI("/decks");
   const decks: Deck[] = await resp.json();
   const sortedDecks = [...decks].sort(
-    (d1, d2) => d1.Player.id - d2.Player.id || d1.name.localeCompare(d2.name)
+    (d1, d2) => d1.player.id - d2.player.id || d1.name.localeCompare(d2.name)
   );
   setDecks(sortedDecks);
 };
 
-export const fetchLocations = async (
-  setLocations: (locations: GameLocation[]) => void
-) => {
-  const resp = await callAPI("/locations");
-  const locations: GameLocation[] = await resp.json();
-  const sortedLocations = [...locations].sort((l1, l2) =>
-    l1.name.localeCompare(l2.name)
-  );
-  setLocations(sortedLocations);
+export const fetchGames = async (setGames: (games: Game[]) => void) => {
+  const resp = await callAPI("/games");
+  const games: Game[] = await resp.json();
+  setGames(games);
 };

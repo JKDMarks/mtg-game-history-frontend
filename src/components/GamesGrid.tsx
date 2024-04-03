@@ -2,7 +2,7 @@ import { Box, Button, Grid } from "@mui/material";
 import { useNavigate, useRouteLoaderData } from "react-router-dom";
 
 import { Divider } from ".";
-import { Game, Player, canCurrPlayerViewGame } from "../helpers";
+import { Game, User, canCurrUserViewGame } from "../helpers";
 import { Fragment } from "react";
 import { ROOT_ROUTE_ID } from "../App";
 
@@ -14,7 +14,7 @@ export default function GamesGrid({
   shouldShowPrivateGames?: boolean;
 }) {
   const navigate = useNavigate();
-  const currPlayer = useRouteLoaderData(ROOT_ROUTE_ID) as Player;
+  const currUser = useRouteLoaderData(ROOT_ROUTE_ID) as User;
 
   return (
     <Grid
@@ -24,7 +24,7 @@ export default function GamesGrid({
       sx={{ marginTop: "0" }}
     >
       {games.map((game, idx) => {
-        if (!canCurrPlayerViewGame(currPlayer, game)) {
+        if (!canCurrUserViewGame(currUser, game)) {
           return shouldShowPrivateGames ? (
             <Grid item key={idx} xs={1}>
               <Button
@@ -64,30 +64,26 @@ export default function GamesGrid({
               }}
               onClick={() => navigate(`/games/${game.id}`)}
             >
-              <Box>
-                {game.Location?.name} <br /> {game.date}
-                <br />
-                Game #{game.gameNum}
-              </Box>
+              <Box>{game.date}</Box>
               <Divider />
               <Grid container columns={7}>
-                {(game.GamePlayerDecks || []).map(
-                  ({ Player, Deck, isWinner }, gpdIdx) => (
+                {(game.game_player_decks || []).map(
+                  ({ player, deck, is_winner }, gpdIdx) => (
                     <Fragment key={gpdIdx}>
                       <Grid
                         item
                         xs={1}
                         className="flex flex-col justify-center items-center"
                       >
-                        <Box className="">{isWinner && "⭐"}</Box>
+                        <Box className="">{Boolean(is_winner) && "⭐"}</Box>
                       </Grid>
                       <Grid item xs={5}>
                         <Grid container columns={1}>
                           <Grid item xs={1} className="text-gray-700">
-                            {Player.name}
+                            {player.name}
                           </Grid>
                           <Grid item xs={1} className="text-gray-500">
-                            {Deck.name}
+                            {deck.name}
                           </Grid>
                         </Grid>
                       </Grid>
@@ -96,10 +92,12 @@ export default function GamesGrid({
                         xs={1}
                         className="flex flex-col justify-center items-center"
                       >
-                        <Box className="">{isWinner && "⭐"}</Box>
+                        <Box className="">{Boolean(is_winner) && "⭐"}</Box>
                       </Grid>
-                      {game.GamePlayerDecks &&
-                        gpdIdx + 1 < game.GamePlayerDecks.length && <Divider />}
+                      {game.game_player_decks &&
+                        gpdIdx + 1 < game.game_player_decks.length && (
+                          <Divider />
+                        )}
                     </Fragment>
                   )
                 )}

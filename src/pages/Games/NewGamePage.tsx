@@ -1,11 +1,9 @@
 import {
-  Autocomplete,
   Box,
   Button,
   FormControl,
   FormHelperText,
   Grid,
-  TextField,
   Typography,
 } from "@mui/material";
 
@@ -16,7 +14,7 @@ import {
   Player,
   callAPI,
   fetchDecks,
-  fetchMostRecentGameOrCurrentPlayer,
+  fetchMostRecentGame,
   fetchPlayers,
   NewPlayerDeck,
   SetNewPlayerDeckFunctionType,
@@ -25,9 +23,6 @@ import {
   fakePlayer,
   NewGamePlayerDeckError,
   emptyNewGamePlayerDeckError,
-  fakeLocation,
-  GameLocation,
-  fetchLocations,
   NewGameErrors,
   getTodaysDate,
 } from "../../helpers";
@@ -42,7 +37,6 @@ export default function NewGamePage() {
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
-  const [locations, setLocations] = useState<GameLocation[]>([]);
 
   const [newPlayerDecks, setNewPlayerDecks] = useState<NewPlayerDeck[]>([
     { ...emptyNewPlayerDeck },
@@ -57,9 +51,6 @@ export default function NewGamePage() {
   const [selectedDeckIds, setSelectedDeckIds] = useState<Set<number>>(
     new Set()
   );
-  const [newGameLocation, setNewGameLocation] = useState<GameLocation>({
-    ...fakeLocation,
-  });
 
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -70,7 +61,6 @@ export default function NewGamePage() {
   useEffect(() => {
     fetchPlayers(setPlayers);
     fetchDecks(setDecks);
-    fetchLocations(setLocations);
   }, []);
 
   useEffect(() => {
@@ -81,18 +71,10 @@ export default function NewGamePage() {
         break;
       }
     }
-    if (newGameLocation.id > 0) {
-      shouldContinue = false;
+    if (shouldContinue && players.length > 0 && decks.length > 0) {
+      fetchMostRecentGame(setNewPlayerDecks);
     }
-    if (
-      shouldContinue &&
-      players.length > 0 &&
-      decks.length > 0 &&
-      locations.length > 0
-    ) {
-      fetchMostRecentGameOrCurrentPlayer(setNewPlayerDecks, setNewGameLocation);
-    }
-  }, [players, decks, locations, newPlayerDecks, newGameLocation]);
+  }, [players, decks, newPlayerDecks]);
 
   // unique player and deck ids; used to disallow multiples
   useEffect(() => {
@@ -219,7 +201,6 @@ export default function NewGamePage() {
       .map(() => ({ ...emptyNewGamePlayerDeckError }));
 
     return {
-      location: "",
       playerDecks: tempPDErrors,
     };
   };
@@ -239,10 +220,6 @@ export default function NewGamePage() {
         dontContinue = true;
       }
     }
-    if (newGameLocation.id < 0) {
-      tempErrors.location = "No location selected";
-      dontContinue = true;
-    }
     setErrors(tempErrors);
     if (dontContinue) {
       return;
@@ -256,12 +233,11 @@ export default function NewGamePage() {
     }
 
     const body = {
-      locationId: newGameLocation.id,
       date: getTodaysDate(),
-      playerDecks: newPlayerDecks.map((pd, i) => ({
-        playerId: pd.player.id,
-        deckId: pd.deck.id,
-        isWinner: winnerIndex === i,
+      player_decks: newPlayerDecks.map((pd, i) => ({
+        player_id: pd.player.id,
+        deck_id: pd.deck.id,
+        is_winner: winnerIndex === i,
       })),
     };
     const resp = await callAPI("/games", {
@@ -318,29 +294,6 @@ export default function NewGamePage() {
                 );
               })}
             </Grid>
-            <Box>Location</Box>
-            <Autocomplete
-              id="new-location"
-              // disableClearable
-              clearIcon={null}
-              sx={{ minWidth: "300px" }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Location"
-                  error={!!errors.location}
-                />
-              )}
-              options={locations}
-              isOptionEqualToValue={(location, value) =>
-                location.id === value.id
-              }
-              getOptionLabel={(location) => location.name}
-              value={newGameLocation.id > 0 ? newGameLocation : null}
-              onChange={(_, location) =>
-                location && setNewGameLocation(location)
-              }
-            />
             {errorMsg && <FormHelperText error>{errorMsg}</FormHelperText>}
             <Button
               type="submit"

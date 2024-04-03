@@ -59,8 +59,8 @@ export default function NewGameSinglePlayerDeck({
   const orderedDecks = [...decks].sort((d1, d2) =>
     currPlayerId < 0
       ? 0
-      : orderedPlayerIds.indexOf(d1.Player.id) -
-        orderedPlayerIds.indexOf(d2.Player.id)
+      : orderedPlayerIds.indexOf(d1.player.id) -
+        orderedPlayerIds.indexOf(d2.player.id)
   );
 
   return (
@@ -140,15 +140,15 @@ export default function NewGameSinglePlayerDeck({
             return option.label;
           }
           if ("name" in option) {
-            return option.Player.id === currPlayerId
+            return option.player.id === currPlayerId
               ? option.name
-              : `${option.Player.name}'s ${option.name}`;
+              : `${option.player.name}'s ${option.name}`;
           }
           return "please report this bug";
         }}
         groupBy={(deck) => {
           if ("inputValue" in deck) return "Add new deck";
-          return deck.Player.id === currPlayerId
+          return deck.player.id === currPlayerId
             ? `${newPlayerDeck.player.name}'s own decks`
             : "Other players' decks";
         }}

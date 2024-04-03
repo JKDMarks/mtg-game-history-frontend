@@ -1,18 +1,11 @@
-import { Deck, Game, Player, GameLocation } from "./types";
-
-export const fakeLocation: GameLocation = {
-  id: -1,
-  name: "",
-  isPublic: true,
-};
+import { Deck, Game, Player } from "./types";
 
 export const fakeGame: Game = {
   id: -1,
+  user_id: -1,
   date: "YYYY-MM-DD",
-  gameNum: -1,
-  locationId: -1,
   notes: "",
-  Location: { ...fakeLocation },
+  game_player_decks: [],
 };
 
 export const fakePlayer: Player = {
@@ -23,7 +16,7 @@ export const fakePlayer: Player = {
 export const fakeDeck: Deck = {
   id: -1,
   name: "",
-  Player: { ...fakePlayer },
+  player: { ...fakePlayer },
 };
 
 export type NewPlayerDeck = {
@@ -45,7 +38,6 @@ export type SetNewPlayerDeckFunctionType = ({
 
 export type NewGamePlayerDeckError = { player: string; deck: string };
 export type NewGameErrors = {
-  location: string;
   playerDecks: NewGamePlayerDeckError[];
 };
 export const emptyNewGamePlayerDeckError = { player: "", deck: "" };

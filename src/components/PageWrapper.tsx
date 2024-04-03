@@ -12,22 +12,18 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link, useNavigate, useRouteLoaderData } from "react-router-dom";
-import { Player, callAPI } from "../helpers";
+import { User, callAPI } from "../helpers";
 import { ROOT_ROUTE_ID } from "../App";
 import { useState } from "react";
 
-const appBarPages = [
-  { label: "Create New Game", link: "/games/new" },
-  { label: "Players", link: "/players" },
-  // { label: "Decks", link: "/decks" },
-];
+type AppBarPage = { label: string; link: string; isImportant?: boolean };
 
 export default function PageWrapper({
   children,
 }: {
   children: JSX.Element | JSX.Element[];
 }) {
-  const currPlayer = useRouteLoaderData(ROOT_ROUTE_ID) as Player;
+  const currUser = useRouteLoaderData(ROOT_ROUTE_ID) as User;
   const navigate = useNavigate();
 
   const theme = useTheme();
@@ -42,6 +38,22 @@ export default function PageWrapper({
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
+  const createNewGamePage: AppBarPage = {
+    label: "Create New Game",
+    link: "/games/new",
+  };
+  const gamesPage: AppBarPage = { label: "All Games", link: "/games" };
+  // const playersPage: AppBarPage = { label: "Players", link: "/players" };
+  const decksPage: AppBarPage = { label: "Decks", link: "/decks" };
+  const myProfilePage: AppBarPage = {
+    label: "My Profile",
+    link: `/users/${currUser.id}`,
+  };
+  const appBarPages: AppBarPage[] = [createNewGamePage, gamesPage, decksPage];
+  if (!isMdOrLarger) {
+    appBarPages.push(myProfilePage);
+  }
 
   return (
     <Box className="min-h-screen flex flex-col">
@@ -64,13 +76,7 @@ export default function PageWrapper({
                   open={Boolean(anchorElNav)}
                   onClose={handleCloseNavMenu}
                 >
-                  {[
-                    ...appBarPages,
-                    {
-                      label: "My Profile",
-                      link: `/players/${currPlayer.id}`,
-                    },
-                  ].map((page, i) => (
+                  {appBarPages.map((page, i) => (
                     <MenuItem key={i} onClick={() => navigate(page.link)}>
                       <Typography textAlign="center">{page.label}</Typography>
                     </MenuItem>
@@ -96,7 +102,7 @@ export default function PageWrapper({
               className="flex flex-row space-x-10 align-center"
             >
               {isMdOrLarger ? (
-                <Link to={`/players/${currPlayer.id}`}>{currPlayer.name}</Link>
+                <Link to={`/users/${currUser.id}`}>{currUser.username}</Link>
               ) : null}
               <Link
                 to="/login"

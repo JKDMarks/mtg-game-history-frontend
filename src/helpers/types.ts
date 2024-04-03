@@ -1,21 +1,16 @@
-export type Game = {
+export interface User {
   id: number;
-  date: string;
-  gameNum: number;
-  locationId: number;
-  notes: string | null;
-  Location: GameLocation;
-  GamePlayerDecks?: GamePlayerDeck[];
-};
-// type LocationType = "HOUSE" | "STORE";
+  username: string;
+  user_level: number;
+}
 
-export type GameLocation = {
+export interface Game {
   id: number;
-  name: string;
-  isPublic: boolean;
-  // type: LocationType;
-  Games?: Game[];
-};
+  user_id: number;
+  date: string;
+  notes: string | null;
+  game_player_decks: GamePlayerDeck[];
+}
 
 export enum USER_LEVEL {
   BANNED = 0,
@@ -24,23 +19,44 @@ export enum USER_LEVEL {
   ADMIN = 9,
 }
 
-export type Player = {
+export interface Player {
   id: number;
+  user_id?: number;
   name: string;
-  username?: string;
-  userLevel?: number;
-  Decks?: Deck[];
-};
+}
 
-export type Deck = {
+export interface PlayerWithDecks extends Player {
+  decks: Deck[];
+}
+
+export interface Deck {
   id: number;
+  // player_id: number;
+  user_id?: number;
   name: string;
-  Player: Player;
-};
+  player: Player;
+}
 
-export type GamePlayerDeck = {
-  isWinner: boolean | null;
-  GameId: number;
-  Player: Player;
-  Deck: Deck;
-};
+export interface GamePlayerDeck {
+  is_winner: 0 | 1;
+  deck: Deck;
+  player: Player;
+}
+
+// const game_player_decks: GamePlayerDeck[] = [
+//   {
+//     deck: {
+//       id: 1,
+//       name: "5C Omnath Landfall",
+//       player: {
+//         id: 1,
+//         name: "Jeff Marks",
+//       },
+//     },
+//     player: {
+//       id: 1,
+//       name: "Jeff Marks",
+//     },
+//     is_winner: 1,
+//   },
+// ];

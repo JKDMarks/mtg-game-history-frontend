@@ -5,7 +5,7 @@ import {
   Game,
   fakeGame,
   callAPI,
-  canCurrPlayerViewGame,
+  canCurrUserViewGame,
   Player,
 } from "../../helpers";
 
@@ -30,7 +30,7 @@ export default function NewGamePage() {
   }, [gameId]);
 
   useEffect(() => {
-    if (!canCurrPlayerViewGame(currPlayer, game)) {
+    if (!canCurrUserViewGame(currPlayer, game)) {
       navigate("/");
     }
   }, [currPlayer, navigate, game]);
