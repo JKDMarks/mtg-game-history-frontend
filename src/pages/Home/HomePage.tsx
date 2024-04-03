@@ -41,7 +41,7 @@ function HomePage() {
               },
             }}
           >
-            Create New Game
+            New Game
           </Button>
         </Box>
         <Typography variant="h5" className="underline mb-0">

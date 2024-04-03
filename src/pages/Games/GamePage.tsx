@@ -6,7 +6,7 @@ import {
   fakeGame,
   callAPI,
   canCurrUserViewGame,
-  Player,
+  User,
 } from "../../helpers";
 
 import { PageWrapper } from "../../components";
@@ -14,7 +14,7 @@ import { ROOT_ROUTE_ID } from "../../App";
 
 export default function NewGamePage() {
   const { gameId } = useParams();
-  const currPlayer = useRouteLoaderData(ROOT_ROUTE_ID) as Player;
+  const currUser = useRouteLoaderData(ROOT_ROUTE_ID) as User;
   const navigate = useNavigate();
 
   const [game, setGame] = useState<Game>(fakeGame);
@@ -30,10 +30,10 @@ export default function NewGamePage() {
   }, [gameId]);
 
   useEffect(() => {
-    if (!canCurrUserViewGame(currPlayer, game)) {
+    if (!canCurrUserViewGame(currUser, game)) {
       navigate("/");
     }
-  }, [currPlayer, navigate, game]);
+  }, [currUser, navigate, game]);
 
   return (
     <PageWrapper>
@@ -45,28 +45,26 @@ export default function NewGamePage() {
               className="underline"
               sx={{ marginBottom: "0.75rem" }}
             >
-              {game.Location?.name} on {game.date}, game #{game.gameNum}
+              {game.id} -- {game.date}
             </Typography>
             <Grid container spacing={2} columns={{ xs: 1, md: 2, lg: 4 }}>
-              {game.GamePlayerDecks?.map((gpd, gpdIdx) => {
-                const player = gpd.Player;
-                const deck = gpd.Deck;
-                const didPlayOwnDeck = player.id === deck.Player?.id;
-                return (
-                  <Grid key={gpdIdx} item xs={1} md={1} lg={1}>
-                    {gpd.isWinner && "⭐"}
-                    <Link href={`/players/${player.id}`}>
-                      {gpd.Player.name}
-                    </Link>
-                    {gpd.isWinner && "⭐"}
-                    <br />
-                    <Link href={`/decks/${deck.id}`}>
-                      {!didPlayOwnDeck && `${gpd.Deck.Player.name}'s `}
-                      {gpd.Deck.name}
-                    </Link>
-                  </Grid>
-                );
-              })}
+              {game.game_player_decks?.map(
+                ({ player, deck, is_winner }, gpdIdx) => {
+                  const didPlayOwnDeck = player.id === deck.player?.id;
+                  return (
+                    <Grid key={gpdIdx} item xs={1} md={1} lg={1}>
+                      {Boolean(is_winner) && "⭐"}
+                      <Link href={`/players/${player.id}`}>{player.name}</Link>
+                      {Boolean(is_winner) && "⭐"}
+                      <br />
+                      <Link href={`/decks/${deck.id}`}>
+                        {!didPlayOwnDeck && `${deck.player.name}'s `}
+                        {deck.name}
+                      </Link>
+                    </Grid>
+                  );
+                }
+              )}
             </Grid>
             {game.notes && <Box>Notes: {game.notes}</Box>}
           </>

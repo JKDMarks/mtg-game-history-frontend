@@ -260,7 +260,7 @@ export default function NewGamePage() {
           className="underline"
           sx={{ marginBottom: "0.75rem" }}
         >
-          Create New Game
+          New Game
         </Typography>
         <FormControl component="form" onSubmit={handleSubmitNewGame}>
           <Box

@@ -1,16 +1,18 @@
-import { useParams, useRouteLoaderData } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Divider, PageWrapper, GamesGrid } from "../../components";
-import { Button, Grid, Link, Typography } from "@mui/material";
+import { Grid, Link, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Game, Player, callAPI, fakePlayer } from "../../helpers";
-import { ROOT_ROUTE_ID } from "../../App";
+import { Game, PlayerWithDecks, callAPI, fakePlayer } from "../../helpers";
 
 export default function SinglePlayerPage() {
   const { playerId } = useParams();
-  const currPlayer = useRouteLoaderData(ROOT_ROUTE_ID) as Player;
 
   const [games, setGames] = useState<Game[]>([]);
-  const [player, setPlayer] = useState<Player>({ ...fakePlayer });
+  const [player, setPlayer] = useState<PlayerWithDecks>({
+    ...fakePlayer,
+    decks: [],
+  });
+  const [gameWinCt, setGameWinCt] = useState<number>(0);
 
   useEffect(() => {
     const fetchPlayer = async () => {
@@ -27,6 +29,15 @@ export default function SinglePlayerPage() {
     fetchGames();
   }, [playerId]);
 
+  useEffect(() => {
+    const gamesWon = games.filter(
+      (game) =>
+        game.game_player_decks.find((gpd) => gpd.is_winner === 1)?.player.id ===
+        player.id
+    );
+    setGameWinCt(gamesWon.length);
+  }, [games, player]);
+
   return (
     <PageWrapper>
       {player.id > 0 ? (
@@ -37,13 +48,11 @@ export default function SinglePlayerPage() {
           <Typography className="text-gray-600">
             Played in {games.length} games
           </Typography>
-          {
-            // TODO: Edit profile page
-            false && currPlayer.id === player.id && (
-              <Button variant="contained">Edit Profile</Button>
-            )
-          }
-          {!!player.Decks?.length && (
+          <Typography className="text-gray-600">
+            Won {gameWinCt} games (
+            {((gameWinCt / games.length) * 100).toFixed(2)}%)
+          </Typography>
+          {!!player.decks?.length && (
             <>
               <Divider margins />
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
@@ -60,7 +69,7 @@ export default function SinglePlayerPage() {
                   marginTop: "-8px",
                 }}
               >
-                {player.Decks.map(({ id, name }, i) => (
+                {player.decks.map(({ id, name }, i) => (
                   <Grid item key={i} xs={1}>
                     <Link href={`/decks/${id}`}>{name}</Link>
                   </Grid>

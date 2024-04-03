@@ -40,17 +40,17 @@ export default function PageWrapper({
   };
 
   const createNewGamePage: AppBarPage = {
-    label: "Create New Game",
+    label: "New Game",
     link: "/games/new",
   };
   const gamesPage: AppBarPage = { label: "All Games", link: "/games" };
-  // const playersPage: AppBarPage = { label: "Players", link: "/players" };
-  const decksPage: AppBarPage = { label: "Decks", link: "/decks" };
+  const playersPage: AppBarPage = { label: "Players", link: "/players" };
+  // const decksPage: AppBarPage = { label: "Decks", link: "/decks" };
   const myProfilePage: AppBarPage = {
     label: "My Profile",
     link: `/users/${currUser.id}`,
   };
-  const appBarPages: AppBarPage[] = [createNewGamePage, gamesPage, decksPage];
+  const appBarPages: AppBarPage[] = [createNewGamePage, gamesPage, playersPage];
   if (!isMdOrLarger) {
     appBarPages.push(myProfilePage);
   }

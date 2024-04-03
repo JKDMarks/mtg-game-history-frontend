@@ -119,31 +119,35 @@ export default function AllGamesPage() {
   ];
 
   const rows = games.map(({ id, date, game_player_decks, notes }) => {
+    const gpds = [...game_player_decks].sort(
+      (gpd1, gpd2) =>
+        gpd1.player.id - gpd2.player.id || gpd1.deck.id - gpd2.deck.id
+    );
     const winnerIdx = game_player_decks.findIndex((gpd) => gpd.is_winner);
     return {
       id,
       date,
       notes,
 
-      player1: game_player_decks[0]?.player.name,
-      deck1: game_player_decks[0]?.deck.name,
-      player1Id: game_player_decks[0]?.player.id,
-      deck1Id: game_player_decks[0]?.deck.id,
+      player1: gpds[0]?.player.name,
+      deck1: gpds[0]?.deck.name,
+      player1Id: gpds[0]?.player.id,
+      deck1Id: gpds[0]?.deck.id,
 
-      player2: game_player_decks[1]?.player.name,
-      deck2: game_player_decks[1]?.deck.name,
-      player2Id: game_player_decks[1]?.player.id,
-      deck2Id: game_player_decks[1]?.deck.id,
+      player2: gpds[1]?.player.name,
+      deck2: gpds[1]?.deck.name,
+      player2Id: gpds[1]?.player.id,
+      deck2Id: gpds[1]?.deck.id,
 
-      player3: game_player_decks[2]?.player.name,
-      deck3: game_player_decks[2]?.deck.name,
-      player3Id: game_player_decks[2]?.player.id,
-      deck3Id: game_player_decks[2]?.deck.id,
+      player3: gpds[2]?.player.name,
+      deck3: gpds[2]?.deck.name,
+      player3Id: gpds[2]?.player.id,
+      deck3Id: gpds[2]?.deck.id,
 
-      player4: game_player_decks[3]?.player.name,
-      deck4: game_player_decks[3]?.deck.name,
-      player4Id: game_player_decks[3]?.player.id,
-      deck4Id: game_player_decks[3]?.deck.id,
+      player4: gpds[3]?.player.name,
+      deck4: gpds[3]?.deck.name,
+      player4Id: gpds[3]?.player.id,
+      deck4Id: gpds[3]?.deck.id,
 
       winnerIdx,
     };

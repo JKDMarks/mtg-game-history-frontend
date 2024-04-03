@@ -9,6 +9,7 @@ export default function DeckPage() {
 
   const [deck, setDeck] = useState<Deck>({ ...fakeDeck });
   const [games, setGames] = useState<Game[]>([]);
+  const [gameWinCt, setGameWinCt] = useState<number>(0);
 
   useEffect(() => {
     const fetchDeck = async () => {
@@ -25,15 +26,28 @@ export default function DeckPage() {
     fetchGames();
   }, [deckId]);
 
+  useEffect(() => {
+    const gamesWon = games.filter(
+      (game) =>
+        game.game_player_decks.find((gpd) => gpd.is_winner === 1)?.player.id ===
+        deck.id
+    );
+    setGameWinCt(gamesWon.length);
+  }, [games, deck]);
+
   return (
     <PageWrapper>
       {deck.id > 0 ? (
         <>
           <Typography variant="h5" className="underline">
-            {deck.Player.name}'s {deck.name}
+            {deck.player.name}'s {deck.name}
           </Typography>
           <Typography className="text-gray-600" sx={{ marginBottom: "0.5rem" }}>
             Played in {games.length} games
+          </Typography>
+          <Typography className="text-gray-600">
+            Won {gameWinCt} games (
+            {((gameWinCt / games.length) * 100).toFixed(2)}%)
           </Typography>
           <GamesGrid games={games} shouldShowPrivateGames />
         </>

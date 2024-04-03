@@ -1,5 +1,5 @@
 import moment from "moment";
-import { Deck, Game, Player, User, USER_LEVEL } from "./types";
+import { Deck, Game, PlayerWithDecks, User, USER_LEVEL } from "./types";
 import { NewPlayerDeck } from "./constants";
 
 export const canCurrUserViewGame = (currUser: User, game: Game) => {
@@ -54,9 +54,11 @@ export const fetchMostRecentGame = async (
   }
 };
 
-export const fetchPlayers = async (setPlayers: (players: Player[]) => void) => {
+export const fetchPlayers = async (
+  setPlayers: (players: PlayerWithDecks[]) => void
+) => {
   const resp = await callAPI("/players");
-  const players: Player[] = await resp.json();
+  const players: PlayerWithDecks[] = await resp.json();
   const sortedPlayers = [...players].sort((p1, p2) =>
     p1.name.localeCompare(p2.name)
   );
