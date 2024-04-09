@@ -84,9 +84,23 @@ export default function PageWrapper({
                 </Menu>
               </>
             )}
-            <Link className="text-xl font-bold" to="/">
-              MTG Game History
-            </Link>
+            <Box
+              className="flex flex-row items-center space-x-2"
+              sx={{ cursor: "pointer" }}
+              onClick={() => navigate("/")}
+              title={
+                '"After his death, monks spent ten years transcribing the tattoos from Reki\'s body and gathering stories from those who spoke with him. Thus the volume you hold was written." —The History of Kamigawa'
+              }
+            >
+              <img
+                style={{
+                  maxWidth: "25px",
+                  maxHeight: "25px",
+                }}
+                src="/reki.jpg"
+              />
+              <Box className="text-xl font-bold">Reki</Box>
+            </Box>
             {isMdOrLarger ? (
               <>
                 {appBarPages.map((page, i) => (
