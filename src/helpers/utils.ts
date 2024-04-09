@@ -20,7 +20,7 @@ export async function callAPI(
     ? { "Content-Type": "application/json" }
     : undefined;
 
-  return await fetch(process.env.API_URL + route, {
+  return await fetch(import.meta.env.VITE_API_URL + route, {
     method: options?.method ?? "GET",
     mode: "cors",
     credentials: "include",
