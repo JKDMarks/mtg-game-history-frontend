@@ -100,6 +100,12 @@ export default function GenericAuthForm({ type }: { type: AuthForm }) {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
           )}
+          {type === "SIGNUP" && (
+            <Box sx={{ color: "#ff00ff" }}>
+              🥰 ¡give me your data please! 🥰
+            </Box>
+          )}
+
           <Button variant="outlined" type="submit">
             {type === "LOGIN" ? "login" : "signup"}
           </Button>
