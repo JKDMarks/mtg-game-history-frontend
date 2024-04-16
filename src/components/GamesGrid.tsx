@@ -53,6 +53,7 @@ export default function GamesGrid({
                 display: "flex",
                 flexDirection: "column",
                 minHeight: "100px",
+                height: "100%",
                 width: "100%",
                 backgroundColor: "lightgray",
                 "&:hover": {
