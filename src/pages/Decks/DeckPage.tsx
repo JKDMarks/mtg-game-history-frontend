@@ -29,7 +29,7 @@ export default function DeckPage() {
   useEffect(() => {
     const gamesWon = games.filter(
       (game) =>
-        game.game_player_decks.find((gpd) => gpd.is_winner === 1)?.player.id ===
+        game.game_player_decks.find((gpd) => gpd.is_winner === 1)?.deck.id ===
         deck.id
     );
     setGameWinCt(gamesWon.length);

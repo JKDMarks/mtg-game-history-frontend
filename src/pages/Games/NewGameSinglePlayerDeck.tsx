@@ -77,6 +77,7 @@ export default function NewGameSinglePlayerDeck({
       </Box>
       <Autocomplete
         className="mb-4"
+        noOptionsText="Start typing to add a new player"
         renderInput={(params) => (
           <TextField
             {...params}
@@ -126,6 +127,7 @@ export default function NewGameSinglePlayerDeck({
       />
       <Autocomplete
         disabled={currPlayerId < 0}
+        noOptionsText="Start typing to add a new deck"
         renderInput={(params) => (
           <TextField
             {...params}

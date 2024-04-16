@@ -97,9 +97,9 @@ export default function PageWrapper({
                   maxWidth: "25px",
                   maxHeight: "25px",
                 }}
-                src="/reki.jpg"
+                src="/hex.png"
               />
-              <Box className="text-xl font-bold">Reki</Box>
+              <Box className="text-xl font-bold">Saga</Box>
             </Box>
             {isMdOrLarger ? (
               <>

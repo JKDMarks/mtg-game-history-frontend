@@ -179,7 +179,7 @@ export default function NewGamePage() {
     const resp = await callAPI("/decks", {
       method: "POST",
       body: {
-        playerId: newDeckDialogPlayer.id,
+        player_id: newDeckDialogPlayer.id,
         name: newDeckDialogDeckName,
       },
     });

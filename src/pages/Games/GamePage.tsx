@@ -12,7 +12,7 @@ import {
 import { PageWrapper } from "../../components";
 import { ROOT_ROUTE_ID } from "../../App";
 
-export default function NewGamePage() {
+export default function GamePage() {
   const { gameId } = useParams();
   const currUser = useRouteLoaderData(ROOT_ROUTE_ID) as User;
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function NewGamePage() {
   }, [gameId]);
 
   useEffect(() => {
-    if (!canCurrUserViewGame(currUser, game)) {
+    if (game.id > 0 && !canCurrUserViewGame(currUser, game)) {
       navigate("/");
     }
   }, [currUser, navigate, game]);

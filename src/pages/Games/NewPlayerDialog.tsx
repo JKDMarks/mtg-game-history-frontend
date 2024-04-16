@@ -8,6 +8,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useState } from "react";
+import { NAME_RGX } from "../../helpers";
 
 type NewPlayerDialogProps = {
   open: boolean;
@@ -29,11 +30,10 @@ export default function NewPlayerDialog({
   const checkErrorsAndSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
-    const nameRgx = /^[a-z ,.'-]+$/i;
     if (!newPlayerName) {
       setErrorMsg("Name can't be empty");
       return;
-    } else if (newPlayerName.length >= 64 || !newPlayerName.match(nameRgx)) {
+    } else if (newPlayerName.length >= 64 || !newPlayerName.match(NAME_RGX)) {
       setErrorMsg("Invalid name");
       return;
     }

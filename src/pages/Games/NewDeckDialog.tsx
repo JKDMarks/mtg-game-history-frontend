@@ -8,7 +8,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { Player } from "../../helpers";
+import { NAME_RGX, Player } from "../../helpers";
 import { useState } from "react";
 
 type NewDeckDialogProps = {
@@ -37,11 +37,10 @@ export default function NewDeckDialog({
   const checkErrorsAndSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
-    const nameRgx = /^[a-z ,.'-]+$/i;
     if (!newDeckName) {
       setErrorMsg("Name can't be empty");
       return;
-    } else if (newDeckName.length >= 128 || !newDeckName.match(nameRgx)) {
+    } else if (newDeckName.length >= 128 || !newDeckName.match(NAME_RGX)) {
       setErrorMsg("Invalid name");
       return;
     }
