@@ -81,7 +81,8 @@ export default function NewGameSinglePlayerDeck({
     // }
   };
 
-  const windowInnerHeight = window.innerHeight;
+  // const windowInnerHeight = window.innerHeight;
+  const minHeight = `200px`;
 
   return (
     <Grid item xs={1}>
@@ -96,7 +97,7 @@ export default function NewGameSinglePlayerDeck({
         </Box>
       </Box>
       <Autocomplete
-        ListboxProps={{ style: { minHeight: `${windowInnerHeight - 50}px` } }}
+        ListboxProps={{ style: { minHeight } }}
         className="mb-4"
         noOptionsText="Start typing to add a new player"
         onFocus={scrollIntoView}
@@ -149,7 +150,7 @@ export default function NewGameSinglePlayerDeck({
         }}
       />
       <Autocomplete
-        ListboxProps={{ style: { minHeight: `${windowInnerHeight - 50}px` } }}
+        ListboxProps={{ style: { minHeight } }}
         disabled={currPlayerId < 0}
         noOptionsText="Start typing to add a new deck"
         onFocus={scrollIntoView}
