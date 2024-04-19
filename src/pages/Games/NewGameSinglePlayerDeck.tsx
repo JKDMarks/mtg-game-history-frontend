@@ -63,6 +63,24 @@ export default function NewGameSinglePlayerDeck({
         orderedPlayerIds.indexOf(d2.player.id)
   );
 
+  const scrollIntoView: React.FocusEventHandler = ({ target }) => {
+    const domRect = target.getBoundingClientRect();
+    // const windowDistFromTopOfPage = window.scrollY;
+    // const pageHeight = document.documentElement.scrollHeight;
+    const eltDistToTopOfScreen = domRect.top;
+    // const eltDistToBottomOfScreen = window.innerHeight - domRect.bottom;
+    // console.log(
+    //   windowDistFromTopOfPage + eltDistToBottomOfScreen,
+    //   pageHeight - windowDistFromTopOfPage - eltDistToBottomOfScreen,
+    //   target
+    // );
+    // if (eltDistToTopOfScreen <= eltDistToBottomOfScreen) {
+    window.scrollTo({ top: window.scrollY + eltDistToTopOfScreen });
+    // } else {
+    //   window.scrollTo({ top: window.scrollY - eltDistToBottomOfScreen });
+    // }
+  };
+
   return (
     <Grid item xs={1}>
       <Box>
@@ -78,6 +96,8 @@ export default function NewGameSinglePlayerDeck({
       <Autocomplete
         className="mb-4"
         noOptionsText="Start typing to add a new player"
+        onFocus={scrollIntoView}
+        selectOnFocus={false}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -128,6 +148,8 @@ export default function NewGameSinglePlayerDeck({
       <Autocomplete
         disabled={currPlayerId < 0}
         noOptionsText="Start typing to add a new deck"
+        onFocus={scrollIntoView}
+        selectOnFocus={false}
         renderInput={(params) => (
           <TextField
             {...params}
