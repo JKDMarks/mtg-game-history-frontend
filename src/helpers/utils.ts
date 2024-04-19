@@ -36,6 +36,18 @@ export const getURLPathnameFromRequest = (request: Request) =>
 
 export const getTodaysDate = () => moment().format("YYYY-MM-DD");
 
+export const fetchGameById = async (
+  gameId: string,
+  setNewPlayerDecks: (newPlayerDecks: NewPlayerDeck[]) => void,
+  setWinnerIndex: (idx: number) => void
+) => {
+  const resp = await callAPI("/games/" + gameId);
+  const game: Game = await resp.json();
+
+  setNewPlayerDecks(game.game_player_decks);
+  setWinnerIndex(game.game_player_decks.findIndex((gpd) => gpd.is_winner));
+};
+
 export const fetchMostRecentGame = async (
   setNewPlayerDecks: (newPlayerDecks: NewPlayerDeck[]) => void
 ) => {
@@ -47,10 +59,10 @@ export const fetchMostRecentGame = async (
     mostRecentGame.date === getTodaysDate() &&
     mostRecentGame.game_player_decks
   ) {
-    const tempNewPlayerDecks = mostRecentGame.game_player_decks.map(
-      ({ player, deck }) => ({ player, deck })
-    );
-    setNewPlayerDecks(tempNewPlayerDecks);
+    // const tempNewPlayerDecks = mostRecentGame.game_player_decks.map(
+    //   ({ player, deck }) => ({ player, deck })
+    // );
+    setNewPlayerDecks(mostRecentGame.game_player_decks);
   }
 };
 

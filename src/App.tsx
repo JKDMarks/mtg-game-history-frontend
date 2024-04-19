@@ -12,7 +12,7 @@ import {
   GamePage,
   HomePage,
   LoginPage,
-  NewGamePage,
+  NewOrEditGamePage,
   NotFoundPage,
   PlayersPage,
   SignupPage,
@@ -46,7 +46,8 @@ const router = createBrowserRouter(
       <Route path="signup" element={<SignupPage />} />
       <Route path="games">
         <Route index element={<AllGamesPage />} />
-        <Route path="new" element={<NewGamePage />} />
+        <Route path="new" element={<NewOrEditGamePage />} />
+        <Route path=":gameId/edit" element={<NewOrEditGamePage isEditing />} />
         <Route path=":gameId" element={<GamePage />} />
       </Route>
       <Route path="players">

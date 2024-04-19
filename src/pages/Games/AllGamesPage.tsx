@@ -44,7 +44,16 @@ export default function AllGamesPage() {
   };
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 55 },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 55,
+      renderCell: (params) => (
+        <Link href={`/games/${params.formattedValue}`}>
+          {params.formattedValue}
+        </Link>
+      ),
+    },
     {
       field: "date",
       headerName: "Date",
@@ -114,7 +123,7 @@ export default function AllGamesPage() {
       (gpd1, gpd2) =>
         gpd1.player.id - gpd2.player.id || gpd1.deck.id - gpd2.deck.id
     );
-    const winnerIdx = game_player_decks.findIndex((gpd) => gpd.is_winner);
+    const winnerIdx = gpds.findIndex((gpd) => gpd.is_winner);
     return {
       id,
       date,

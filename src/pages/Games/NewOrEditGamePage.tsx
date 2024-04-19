@@ -25,15 +25,26 @@ import {
   emptyNewGamePlayerDeckError,
   NewGameErrors,
   getTodaysDate,
+  Game,
+  canCurrUserViewGame,
+  User,
 } from "../../helpers";
 
 import NewGameSinglePlayerDeck from "./NewGameSinglePlayerDeck";
 import NewPlayerDialog from "./NewPlayerDialog";
 import NewDeckDialog from "./NewDeckDialog";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
+import { ROOT_ROUTE_ID } from "../../App";
 
-export default function NewGamePage() {
+export default function NewOrEditGamePage({
+  isEditing = false,
+}: {
+  isEditing?: boolean;
+}) {
   const navigate = useNavigate();
+  const currUser = useRouteLoaderData(ROOT_ROUTE_ID) as User;
+
+  const { gameId } = useParams();
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
@@ -64,6 +75,16 @@ export default function NewGamePage() {
   }, []);
 
   useEffect(() => {
+    const fetchData = async () => {
+      const resp = await callAPI("/games/" + gameId);
+      const game: Game = await resp.json();
+      if (!canCurrUserViewGame(currUser, game)) {
+        navigate("/");
+      }
+      setNewPlayerDecks(game.game_player_decks);
+      setWinnerIndex(game.game_player_decks.findIndex((gpd) => gpd.is_winner));
+    };
+
     let shouldContinue = true;
     for (const pd of newPlayerDecks) {
       if (pd.player.id > 0 || pd.deck.id > 0) {
@@ -71,10 +92,14 @@ export default function NewGamePage() {
         break;
       }
     }
-    if (shouldContinue && players.length > 0 && decks.length > 0) {
-      fetchMostRecentGame(setNewPlayerDecks);
+    if (shouldContinue) {
+      if (isEditing && gameId !== undefined && !isNaN(Number(gameId))) {
+        fetchData();
+      } else if (players.length > 0 && decks.length > 0) {
+        fetchMostRecentGame(setNewPlayerDecks);
+      }
     }
-  }, [players, decks, newPlayerDecks]);
+  }, [players, decks, newPlayerDecks, gameId, isEditing, currUser, navigate]);
 
   // unique player and deck ids; used to disallow multiples
   useEffect(() => {
@@ -240,7 +265,8 @@ export default function NewGamePage() {
         is_winner: winnerIndex === i,
       })),
     };
-    const resp = await callAPI("/games", {
+    const apiRoute = isEditing ? `/games/${gameId}/edit` : "/games";
+    const resp = await callAPI(apiRoute, {
       method: "POST",
       body,
     });
@@ -260,7 +286,7 @@ export default function NewGamePage() {
           className="underline"
           sx={{ marginBottom: "0.75rem" }}
         >
-          New Game
+          {isEditing ? "Edit Game " + gameId : "New Game"}
         </Typography>
         <FormControl component="form" onSubmit={handleSubmitNewGame}>
           <Box
@@ -304,7 +330,7 @@ export default function NewGamePage() {
                 letterSpacing: "0.125rem",
               }}
             >
-              Submit New Game
+              {isEditing ? "Submit Edited Game" : "Submit New Game"}
             </Button>
           </Box>
         </FormControl>

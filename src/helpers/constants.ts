@@ -1,6 +1,6 @@
 import { Deck, Game, Player } from "./types";
 
-export const NAME_RGX = /^[a-z0-9\s,.'-)(]+$/i;
+export const NAME_RGX = /^[a-z0-9\s,.'\-)(]+$/i;
 
 export const fakeGame: Game = {
   id: -1,

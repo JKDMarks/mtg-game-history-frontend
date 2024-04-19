@@ -1,5 +1,5 @@
 import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
-import { Box, Grid, Link, Typography } from "@mui/material";
+import { Box, Button, Grid, Link, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
   Game,
@@ -7,6 +7,7 @@ import {
   callAPI,
   canCurrUserViewGame,
   User,
+  USER_LEVEL,
 } from "../../helpers";
 
 import { PageWrapper } from "../../components";
@@ -23,30 +24,37 @@ export default function GamePage() {
     const fetchData = async () => {
       const resp = await callAPI(`/games/${gameId}`);
       const game = await resp.json();
+      if (
+        game.id === undefined ||
+        (game.id > 0 && !canCurrUserViewGame(currUser, game))
+      ) {
+        navigate("/");
+        return;
+      }
       setGame(game);
     };
 
     fetchData();
-  }, [gameId]);
-
-  useEffect(() => {
-    if (game.id > 0 && !canCurrUserViewGame(currUser, game)) {
-      navigate("/");
-    }
-  }, [currUser, navigate, game]);
+  }, [gameId, currUser, navigate]);
 
   return (
     <PageWrapper>
-      <Box className="flex flex-col">
+      <Box className="flex flex-col items-center">
         {game.id > 0 && (
           <>
-            <Typography
-              variant="h5"
-              className="underline"
-              sx={{ marginBottom: "0.75rem" }}
-            >
-              {game.id} -- {game.date}
+            <Typography variant="h5" className="underline">
+              {currUser.user_level >= USER_LEVEL.ADMIN && game.id + " — "}
+              {game.date}
             </Typography>
+            <Button
+              variant="contained"
+              color="info"
+              size="small"
+              sx={{ maxWidth: "150px", marginBottom: "0.75rem" }}
+              onClick={() => navigate(`/games/${gameId}/edit`)}
+            >
+              Edit Game
+            </Button>
             <Grid container spacing={2} columns={{ xs: 1, md: 2, lg: 4 }}>
               {game.game_player_decks?.map(
                 ({ player, deck, is_winner }, gpdIdx) => {

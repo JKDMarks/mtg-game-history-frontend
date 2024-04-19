@@ -3,6 +3,7 @@ import {
   Box,
   Container,
   IconButton,
+  Link,
   Menu,
   MenuItem,
   Toolbar,
@@ -11,7 +12,7 @@ import {
   useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link, useNavigate, useRouteLoaderData } from "react-router-dom";
+import { useNavigate, useRouteLoaderData } from "react-router-dom";
 import { User, callAPI } from "../helpers";
 import { ROOT_ROUTE_ID } from "../App";
 import { useState } from "react";
@@ -54,6 +55,8 @@ export default function PageWrapper({
   if (!isMdOrLarger) {
     appBarPages.push(myProfilePage);
   }
+
+  const LINK_STYLING = { color: "white", textDecoration: "none" };
 
   return (
     <Box className="min-h-screen flex flex-col">
@@ -104,7 +107,13 @@ export default function PageWrapper({
             {isMdOrLarger ? (
               <>
                 {appBarPages.map((page, i) => (
-                  <Link key={i} to={page.link} className="ml-7 tracking-wider">
+                  <Link
+                    key={i}
+                    href={page.link}
+                    className="tracking-wider"
+                    color="#ffffff"
+                    sx={{ ...LINK_STYLING, marginLeft: "1.75rem" }}
+                  >
                     {page.label.toUpperCase()}
                   </Link>
                 ))}
@@ -116,12 +125,15 @@ export default function PageWrapper({
               className="flex flex-row space-x-10 align-center"
             >
               {isMdOrLarger ? (
-                <Link to={`/users/${currUser.id}`}>{currUser.username}</Link>
+                <Link href={`/users/${currUser.id}`} sx={{ ...LINK_STYLING }}>
+                  {currUser.username}
+                </Link>
               ) : null}
               <Link
-                to="/login"
+                href="/login"
                 onClick={() => callAPI("/auth/logout")}
                 className="font-black"
+                sx={{ ...LINK_STYLING, fontWeight: "bold" }}
               >
                 Logout
               </Link>
