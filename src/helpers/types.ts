@@ -60,3 +60,4 @@ export interface GamePlayerDeck {
 //     is_winner: 1,
 //   },
 // ];
+// game_player_decks;

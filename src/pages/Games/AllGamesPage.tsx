@@ -106,15 +106,6 @@ export default function AllGamesPage() {
       cellClassName: (params) => getCellClassName(params, 3),
       renderCell: (params) => getDeckCellComponent(params, "deck4Id"),
     },
-    // {
-    //   field: "fullName",
-    //   headerName: "Full name",
-    //   description: "This column has a value getter and is not sortable.",
-    //   sortable: false,
-    //   width: 160,
-    //   valueGetter: (value, row) =>
-    //     `${row.firstName || ""} ${row.lastName || ""}`,
-    // },
     { field: "notes", headerName: "Notes", width: 150, sortable: false },
   ];
 

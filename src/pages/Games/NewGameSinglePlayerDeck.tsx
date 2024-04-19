@@ -62,27 +62,13 @@ export default function NewGameSinglePlayerDeck({
       : orderedPlayerIds.indexOf(d1.player.id) -
         orderedPlayerIds.indexOf(d2.player.id)
   );
+  const minHeight = "200px";
 
   const scrollIntoView: React.FocusEventHandler = ({ target }) => {
     const domRect = target.getBoundingClientRect();
-    // const windowDistFromTopOfPage = window.scrollY;
-    // const pageHeight = document.documentElement.scrollHeight;
     const eltDistToTopOfScreen = domRect.top;
-    // const eltDistToBottomOfScreen = window.innerHeight - domRect.bottom;
-    // console.log(
-    //   windowDistFromTopOfPage + eltDistToBottomOfScreen,
-    //   pageHeight - windowDistFromTopOfPage - eltDistToBottomOfScreen,
-    //   target
-    // );
-    // if (eltDistToTopOfScreen <= eltDistToBottomOfScreen) {
     window.scrollTo({ top: window.scrollY + eltDistToTopOfScreen });
-    // } else {
-    //   window.scrollTo({ top: window.scrollY - eltDistToBottomOfScreen });
-    // }
   };
-
-  // const windowInnerHeight = window.innerHeight;
-  const minHeight = `200px`;
 
   return (
     <Grid item xs={1}>
@@ -97,11 +83,12 @@ export default function NewGameSinglePlayerDeck({
         </Box>
       </Box>
       <Autocomplete
-        ListboxProps={{ style: { minHeight } }}
         className="mb-4"
         noOptionsText="Start typing to add a new player"
-        onFocus={scrollIntoView}
+        ListboxProps={{ style: { minHeight } }}
         selectOnFocus={false}
+        onFocus={scrollIntoView}
+        options={players}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -109,7 +96,6 @@ export default function NewGameSinglePlayerDeck({
             error={!!errors.playerDecks[index]?.player}
           />
         )}
-        options={players}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         getOptionLabel={(option) => {
           if ("label" in option && typeof option.label === "string") {
@@ -150,11 +136,12 @@ export default function NewGameSinglePlayerDeck({
         }}
       />
       <Autocomplete
-        ListboxProps={{ style: { minHeight } }}
-        disabled={currPlayerId < 0}
         noOptionsText="Start typing to add a new deck"
-        onFocus={scrollIntoView}
+        ListboxProps={{ style: { minHeight } }}
         selectOnFocus={false}
+        onFocus={scrollIntoView}
+        disabled={currPlayerId < 0}
+        options={orderedDecks}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -162,7 +149,6 @@ export default function NewGameSinglePlayerDeck({
             error={!!errors.playerDecks[index]?.deck}
           />
         )}
-        options={orderedDecks}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         getOptionLabel={(option) => {
           if ("label" in option && typeof option.label === "string") {
@@ -196,7 +182,6 @@ export default function NewGameSinglePlayerDeck({
             setNewPlayerDeck({ deck: option });
           }
         }}
-        // onChange={(_, deck) => setNewPlayerDeck({ deck })}
         filterOptions={(options, params) => {
           const filtered: (Deck | AutocompleteOption)[] = deckFilter(
             options,
