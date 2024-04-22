@@ -62,6 +62,9 @@ export default function NewOrEditGamePage({
   const [selectedDeckIds, setSelectedDeckIds] = useState<Set<number>>(
     new Set()
   );
+  const [gpdIds, setGpdIds] = useState<Array<number | null>>(
+    new Array(newPlayerDecks.length).fill(null)
+  );
 
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -82,22 +85,20 @@ export default function NewOrEditGamePage({
         navigate("/");
       }
       setNewPlayerDecks(game.game_player_decks);
+      setGpdIds(game.game_player_decks.map((gpd) => gpd.id));
       setWinnerIndex(game.game_player_decks.findIndex((gpd) => gpd.is_winner));
     };
 
-    let shouldContinue = true;
-    for (const pd of newPlayerDecks) {
-      if (pd.player.id > 0 || pd.deck.id > 0) {
-        shouldContinue = false;
-        break;
-      }
-    }
-    if (shouldContinue) {
-      if (isEditing && gameId !== undefined && !isNaN(Number(gameId))) {
-        fetchData();
-      } else if (players.length > 0 && decks.length > 0) {
-        fetchMostRecentGame(setNewPlayerDecks);
-      }
+    // fakePlayer.id == 1; fakeDeck.id == 1;
+    const shouldNotContinue = newPlayerDecks.some(
+      (pd) => pd.player.id > 0 || pd.deck.id > 0
+    );
+    if (shouldNotContinue) return;
+
+    if (isEditing && gameId !== undefined && !isNaN(Number(gameId))) {
+      fetchData();
+    } else if (players.length > 0 && decks.length > 0) {
+      fetchMostRecentGame(setNewPlayerDecks);
     }
   }, [players, decks, newPlayerDecks, gameId, isEditing, currUser, navigate]);
 
@@ -118,7 +119,7 @@ export default function NewOrEditGamePage({
   /////////////
   const setNthNewPlayerDeckFactory =
     (n: number): SetNewPlayerDeckFunctionType =>
-    ({ player, deck }) => {
+    ({ player, deck, cards }) => {
       const tempNewPDs = [...newPlayerDecks];
 
       if (player) {
@@ -131,6 +132,10 @@ export default function NewOrEditGamePage({
         tempNewPDs[n].deck = deck;
       } else if (deck === null) {
         tempNewPDs[n].deck = { ...fakeDeck };
+      }
+
+      if (cards) {
+        tempNewPDs[n].cards = cards;
       }
 
       setNewPlayerDecks(tempNewPDs);
@@ -260,9 +265,11 @@ export default function NewOrEditGamePage({
     const body = {
       date: getTodaysDate(),
       player_decks: newPlayerDecks.map((pd, i) => ({
+        id: isEditing ? gpdIds[i] : undefined,
         player_id: pd.player.id,
         deck_id: pd.deck.id,
         is_winner: winnerIndex === i,
+        cards: pd.cards.filter((card) => !!card.name),
       })),
     };
     const apiRoute = isEditing ? `/games/${gameId}/edit` : "/games";

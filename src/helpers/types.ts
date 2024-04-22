@@ -12,13 +12,6 @@ export interface Game {
   game_player_decks: GamePlayerDeck[];
 }
 
-export enum USER_LEVEL {
-  BANNED = 0,
-  RESTRICTED = 1,
-  REGULAR_USER = 2,
-  ADMIN = 9,
-}
-
 export interface Player {
   id: number;
   user_id?: number;
@@ -38,9 +31,24 @@ export interface Deck {
 }
 
 export interface GamePlayerDeck {
+  id: number;
   is_winner: 0 | 1;
   deck: Deck;
   player: Player;
+  cards: Card[];
+}
+
+export interface Card {
+  id?: number;
+  name: string;
+  turn_played: number | null;
+}
+
+export enum USER_LEVEL {
+  BANNED = 0,
+  RESTRICTED = 1,
+  REGULAR_USER = 2,
+  ADMIN = 9,
 }
 
 // const game_player_decks: GamePlayerDeck[] = [

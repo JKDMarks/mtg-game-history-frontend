@@ -57,10 +57,10 @@ export default function GamePage() {
             </Button>
             <Grid container spacing={2} columns={{ xs: 1, md: 2, lg: 4 }}>
               {game.game_player_decks?.map(
-                ({ player, deck, is_winner }, gpdIdx) => {
+                ({ player, deck, is_winner, cards }, gpdIdx) => {
                   const didPlayOwnDeck = player.id === deck.player?.id;
                   return (
-                    <Grid key={gpdIdx} item xs={1} md={1} lg={1}>
+                    <Grid item key={gpdIdx} xs={1} md={1} lg={1}>
                       {Boolean(is_winner) && "⭐"}
                       <Link href={`/players/${player.id}`}>{player.name}</Link>
                       {Boolean(is_winner) && "⭐"}
@@ -69,6 +69,27 @@ export default function GamePage() {
                         {!didPlayOwnDeck && `${deck.player.name}'s `}
                         {deck.name}
                       </Link>
+                      <Box sx={{ display: "flex", flexDirection: "column" }}>
+                        {cards.length > 0 && (
+                          <>
+                            <Box
+                              sx={{
+                                marginTop: "5px",
+                                textDecoration: "underline",
+                              }}
+                            >
+                              Cards Played
+                            </Box>
+                            {cards.map((card, idx) => (
+                              <Box key={"card-" + idx}>
+                                {card.name}
+                                {card.turn_played &&
+                                  " played on turn " + card.turn_played}
+                              </Box>
+                            ))}
+                          </>
+                        )}
+                      </Box>
                     </Grid>
                   );
                 }

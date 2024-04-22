@@ -18,9 +18,14 @@ import {
   SignupPage,
   SinglePlayerPage,
 } from "./pages";
-import { callAPI, getURLPathnameFromRequest } from "./helpers";
+import {
+  callAPI,
+  fetchAllCardNames,
+  getURLPathnameFromRequest,
+} from "./helpers";
 
 export const ROOT_ROUTE_ID = "root";
+export const GAMES_ROUTE_ID = "games";
 
 const redirectHome = () => redirect("/");
 
@@ -44,7 +49,11 @@ const router = createBrowserRouter(
       <Route path="" element={<HomePage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="signup" element={<SignupPage />} />
-      <Route path="games">
+      <Route
+        path="games"
+        id={GAMES_ROUTE_ID}
+        loader={async () => await fetchAllCardNames()}
+      >
         <Route index element={<AllGamesPage />} />
         <Route path="new" element={<NewOrEditGamePage />} />
         <Route path=":gameId/edit" element={<NewOrEditGamePage isEditing />} />

@@ -7,12 +7,14 @@ import {
   createFilterOptions,
 } from "@mui/material";
 import {
+  Card,
   Deck,
   NewGameErrors,
   NewPlayerDeck,
   Player,
   SetNewPlayerDeckFunctionType,
 } from "../../helpers";
+import SinglePlayerDeckCards from "./SinglePlayerDeckCards";
 
 const playerFilter = createFilterOptions<Player>();
 const deckFilter = createFilterOptions<Deck>();
@@ -195,6 +197,10 @@ export default function NewGameSinglePlayerDeck({
           }
           return filtered as Deck[];
         }}
+      />
+      <SinglePlayerDeckCards
+        cards={newPlayerDeck.cards}
+        setCards={(cards: Card[]) => setNewPlayerDeck({ cards })}
       />
     </Grid>
   );

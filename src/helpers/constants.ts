@@ -1,4 +1,4 @@
-import { Deck, Game, Player } from "./types";
+import { Card, Deck, Game, Player } from "./types";
 
 export const NAME_RGX = /^[a-z0-9\s,.'\-)(]+$/i;
 
@@ -21,21 +21,30 @@ export const fakeDeck: Deck = {
   player: { ...fakePlayer },
 };
 
+export const fakeCard: Card = {
+  name: "",
+  turn_played: null,
+};
+
 export type NewPlayerDeck = {
   player: Player;
   deck: Deck;
+  cards: Card[];
 };
 export const emptyNewPlayerDeck: NewPlayerDeck = {
   player: { ...fakePlayer },
   deck: { ...fakeDeck },
+  cards: [],
 };
 
 export type SetNewPlayerDeckFunctionType = ({
   player,
   deck,
+  cards,
 }: {
   player?: Player | null;
   deck?: Deck | null;
+  cards?: Card[] | null;
 }) => void;
 
 export type NewGamePlayerDeckError = { player: string; deck: string };

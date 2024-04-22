@@ -62,7 +62,9 @@ export const fetchMostRecentGame = async (
     // const tempNewPlayerDecks = mostRecentGame.game_player_decks.map(
     //   ({ player, deck }) => ({ player, deck })
     // );
-    setNewPlayerDecks(mostRecentGame.game_player_decks);
+    setNewPlayerDecks(
+      mostRecentGame.game_player_decks.map((gpd) => ({ ...gpd, cards: [] }))
+    );
   }
 };
 
@@ -90,4 +92,28 @@ export const fetchGames = async (setGames: (games: Game[]) => void) => {
   const resp = await callAPI("/games");
   const games: Game[] = await resp.json();
   setGames(games);
+};
+
+export const fetchAllCardNames = async () => {
+  const resp = await fetch("https://api.scryfall.com/catalog/card-names");
+  const data = (await resp.json()).data;
+  const cardNames = data.filter((name: string) => {
+    // exclude Arena cards
+    if (name.startsWith("A-")) {
+      return false;
+    }
+
+    // exclude Secret Lair cereal box DFCs
+    // e.g.  Ulamog, the Ceaseless Hunger //  Ulamog, the Ceaseless Hunger
+    if (name.includes(" // ")) {
+      const nameSplit = name.split(" // ");
+      if (nameSplit[0] === nameSplit[1]) {
+        return false;
+      }
+    }
+
+    // include all other cards
+    return true;
+  });
+  return cardNames;
 };
