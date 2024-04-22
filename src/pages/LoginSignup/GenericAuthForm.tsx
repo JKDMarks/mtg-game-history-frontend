@@ -74,8 +74,9 @@ export default function GenericAuthForm({ type }: { type: AuthForm }) {
           {type === "SIGNUP" && (
             <>
               <FormHelperText sx={{ marginTop: "0 !important" }}>
-                This name you will use to login. It must be 1-20 characters long
-                and contain only A-Z (upper or lower), 0-9, and <code>_</code>.
+                This is the name you will use to login. It must be 1-20
+                characters long. It cannot contain anything outside of A-Z
+                (upper or lower), 0-9, and <code>_</code>.
               </FormHelperText>
             </>
           )}

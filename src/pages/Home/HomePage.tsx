@@ -31,7 +31,7 @@ function HomePage() {
             to="/games/new"
             sx={{
               width: "350px",
-              marginBottom: "1.5rem",
+              // marginBottom: "1.5rem",
               fontSize: "1.25rem",
               color: "black",
               backgroundColor: "#aae0fa",
@@ -44,9 +44,18 @@ function HomePage() {
             New Game
           </Button>
         </Box>
-        <Typography variant="h5" className="underline mb-0">
-          Most Recent Games
-        </Typography>
+        {games.length > 0 && (
+          <Typography
+            variant="h5"
+            sx={{
+              textDecoration: "underline",
+              marginTop: "1.5rem",
+              marginBottom: "0",
+            }}
+          >
+            Most Recent Games
+          </Typography>
+        )}
         <GamesGrid games={games} />
       </Box>
     </PageWrapper>

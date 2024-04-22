@@ -46,8 +46,8 @@ export interface Card {
 
 export enum USER_LEVEL {
   BANNED = 0,
-  RESTRICTED = 1,
-  REGULAR_USER = 2,
+  RESTRICTED = 2,
+  REGULAR_USER = 5,
   ADMIN = 9,
 }
 
