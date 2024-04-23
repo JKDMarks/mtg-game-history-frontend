@@ -15,14 +15,13 @@ import {
   NewOrEditGamePage,
   NotFoundPage,
   PlayersPage,
+  ProfilePage,
   SignupPage,
   SinglePlayerPage,
 } from "./pages";
-import {
-  callAPI,
-  fetchAllCardNames,
-  getURLPathnameFromRequest,
-} from "./helpers";
+import { callAPI, fetchAllCardNames } from "./helpers";
+import { createContext, useState } from "react";
+import "./App.css";
 
 export const ROOT_ROUTE_ID = "root";
 export const GAMES_ROUTE_ID = "games";
@@ -34,17 +33,19 @@ const router = createBrowserRouter(
     <Route
       path="/"
       id={ROOT_ROUTE_ID}
-      loader={async ({ request }) => {
-        const urlPathname = getURLPathnameFromRequest(request);
-        if (!["/login", "/signup"].includes(urlPathname)) {
-          const resp = await callAPI("/test");
-          if (resp.status !== 200) {
-            return redirect("/login");
-          }
+      loader={
+        async (/*{ request }*/) => {
+          // const urlPathname = getURLPathnameFromRequest(request);
+          // if (!["/login", "/signup"].includes(urlPathname)) {
+          //   const resp = await callAPI("/test");
+          //   if (resp.status !== 200) {
+          //     return redirect("/login");
+          //   }
+          // }
+          const resp2 = await callAPI("/me");
+          return await resp2.json();
         }
-        const resp2 = await callAPI("/me");
-        return await resp2.json();
-      }}
+      }
     >
       <Route path="" element={<HomePage />} />
       <Route path="login" element={<LoginPage />} />
@@ -67,13 +68,52 @@ const router = createBrowserRouter(
         <Route index loader={redirectHome} />
         <Route path=":deckId" element={<DeckPage />} />
       </Route>
+      <Route path="profile" element={<ProfilePage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Route>
   )
 );
 
+interface IsLoadingContextType {
+  isLoading: boolean;
+  setIsLoading: (value: boolean) => void;
+}
+export const IsLoadingContext = createContext<IsLoadingContextType>({
+  isLoading: false,
+  setIsLoading: () => {},
+});
+
 function App() {
-  return <RouterProvider router={router} />;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const isLoadingContext = { isLoading, setIsLoading };
+
+  return (
+    <>
+      {isLoading && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 99,
+          }}
+        >
+          <img
+            src="https://raw.githubusercontent.com/JKDMarks/trade-tracker-mobile/master/public/images/WUBRG.png"
+            className="spin"
+            height="150px"
+            width="150px"
+            alt="spinning mana pentagon"
+          />
+        </div>
+      )}
+
+      <IsLoadingContext.Provider value={isLoadingContext}>
+        <RouterProvider router={router} />
+      </IsLoadingContext.Provider>
+    </>
+  );
 }
 
 export default App;

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Link, Typography } from "@mui/material";
 
 import { callAPI, Game } from "../../helpers";
 import { PageWrapper, GamesGrid } from "../../components";
@@ -28,7 +27,7 @@ function HomePage() {
           <Button
             variant="contained"
             component={Link}
-            to="/games/new"
+            href="/games/new"
             sx={{
               width: "350px",
               // marginBottom: "1.5rem",
@@ -41,7 +40,7 @@ function HomePage() {
               },
             }}
           >
-            New Game
+            Record a Game
           </Button>
         </Box>
         {games.length > 0 && (

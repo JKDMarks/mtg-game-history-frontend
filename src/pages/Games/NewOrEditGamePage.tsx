@@ -5,10 +5,12 @@ import {
   FormHelperText,
   Grid,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 import { PageWrapper } from "../../components";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Deck,
   Player,
@@ -34,7 +36,7 @@ import NewGameSinglePlayerDeck from "./NewGameSinglePlayerDeck";
 import NewPlayerDialog from "./NewPlayerDialog";
 import NewDeckDialog from "./NewDeckDialog";
 import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
-import { ROOT_ROUTE_ID } from "../../App";
+import { IsLoadingContext, ROOT_ROUTE_ID } from "../../App";
 
 export default function NewOrEditGamePage({
   isEditing = false,
@@ -43,8 +45,12 @@ export default function NewOrEditGamePage({
 }) {
   const navigate = useNavigate();
   const currUser = useRouteLoaderData(ROOT_ROUTE_ID) as User;
+  const { setIsLoading } = useContext(IsLoadingContext);
 
   const { gameId } = useParams();
+
+  const theme = useTheme();
+  const isSmOrSmaller = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
@@ -78,7 +84,7 @@ export default function NewOrEditGamePage({
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchGameData = async () => {
       const resp = await callAPI("/games/" + gameId);
       const game: Game = await resp.json();
       if (!canCurrUserViewGame(currUser, game)) {
@@ -88,6 +94,15 @@ export default function NewOrEditGamePage({
       setGpdIds(game.game_player_decks.map((gpd) => gpd.id));
       setWinnerIndex(game.game_player_decks.findIndex((gpd) => gpd.is_winner));
     };
+    const fetchData = async () => {
+      setIsLoading(true);
+      if (isEditing && gameId !== undefined && !isNaN(Number(gameId))) {
+        await fetchGameData();
+      } else if (players.length > 0 && decks.length > 0) {
+        await fetchMostRecentGame(setNewPlayerDecks);
+      }
+      setIsLoading(false);
+    };
 
     // fakePlayer.id == 1; fakeDeck.id == 1;
     const shouldNotContinue = newPlayerDecks.some(
@@ -95,12 +110,17 @@ export default function NewOrEditGamePage({
     );
     if (shouldNotContinue) return;
 
-    if (isEditing && gameId !== undefined && !isNaN(Number(gameId))) {
-      fetchData();
-    } else if (players.length > 0 && decks.length > 0) {
-      fetchMostRecentGame(setNewPlayerDecks);
-    }
-  }, [players, decks, newPlayerDecks, gameId, isEditing, currUser, navigate]);
+    fetchData();
+  }, [
+    players,
+    decks,
+    newPlayerDecks,
+    gameId,
+    isEditing,
+    currUser,
+    navigate,
+    setIsLoading,
+  ]);
 
   // unique player and deck ids; used to disallow multiples
   useEffect(() => {
@@ -157,17 +177,23 @@ export default function NewOrEditGamePage({
     setIsNewPlayerDialogOpen(true);
   };
   const handleCloseNewPlayerDialog = () => {
+    setErrorMsg("");
     setIsNewPlayerDialogOpen(false);
     setNewPlayerDialogPlayerName("");
     setNewPlayerDialogOpenedFromIndex(-1);
   };
   const handleSubmitNewPlayerDialog = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
     const resp = await callAPI("/players", {
       method: "POST",
       body: { name: newPlayerDialogPlayerName },
     });
     const newPlayer = await resp.json();
+    if (newPlayer.message) {
+      setErrorMsg(newPlayer.message);
+      return;
+    }
     const tempNewPDs = [...newPlayerDecks];
     tempNewPDs[newPlayerDialogOpenedFromIndex].player = newPlayer;
     setNewPlayerDecks(tempNewPDs);
@@ -199,6 +225,7 @@ export default function NewOrEditGamePage({
     setIsNewDeckDialogOpen(true);
   };
   const handleCloseNewDeckDialog = () => {
+    setErrorMsg("");
     setNewDeckDialogPlayer({ ...fakePlayer });
     setIsNewDeckDialogOpen(false);
     setNewDeckDialogDeckName("");
@@ -206,6 +233,7 @@ export default function NewOrEditGamePage({
   };
   const handleSubmitNewDeckDialog = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
     const resp = await callAPI("/decks", {
       method: "POST",
       body: {
@@ -213,7 +241,11 @@ export default function NewOrEditGamePage({
         name: newDeckDialogDeckName,
       },
     });
-    const newDeck: Deck = await resp.json();
+    const newDeck = await resp.json();
+    if (newDeck.message) {
+      setErrorMsg(newDeck.message);
+      return;
+    }
     const tempNewPDs = [...newPlayerDecks];
     tempNewPDs[newDeckDialogOpenedFromIndex].deck = newDeck;
     fetchDecks(setDecks);
@@ -293,7 +325,7 @@ export default function NewOrEditGamePage({
           className="underline"
           sx={{ marginBottom: "0.75rem" }}
         >
-          {isEditing ? "Edit Game " + gameId : "New Game"}
+          {isEditing ? "Edit Game " + gameId : "Record a New Game"}
         </Typography>
         <FormControl component="form" onSubmit={handleSubmitNewGame}>
           <Box
@@ -348,6 +380,8 @@ export default function NewOrEditGamePage({
         setNewPlayerName={setNewPlayerDialogPlayerName}
         handleClose={handleCloseNewPlayerDialog}
         handleSubmit={handleSubmitNewPlayerDialog}
+        errorMsg={errorMsg}
+        isSmOrSmaller={isSmOrSmaller}
       />
       <NewDeckDialog
         open={isNewDeckDialogOpen}
@@ -358,6 +392,8 @@ export default function NewOrEditGamePage({
         setNewDeckPlayer={setNewDeckDialogPlayer}
         handleClose={handleCloseNewDeckDialog}
         handleSubmit={handleSubmitNewDeckDialog}
+        errorMsg={errorMsg}
+        isSmOrSmaller={isSmOrSmaller}
       />
     </PageWrapper>
   );

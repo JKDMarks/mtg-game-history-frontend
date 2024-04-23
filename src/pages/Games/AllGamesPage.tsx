@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   DataGrid,
   GridCellParams,
@@ -9,13 +9,21 @@ import {
 import { PageWrapper } from "../../components";
 import { fetchGames, Game } from "../../helpers";
 import { Link } from "@mui/material";
+import { IsLoadingContext } from "../../App";
 
 export default function AllGamesPage() {
+  const { setIsLoading } = useContext(IsLoadingContext);
+
   const [games, setGames] = useState<Game[]>([]);
 
   useEffect(() => {
-    fetchGames(setGames);
-  }, []);
+    const fetchData = async () => {
+      setIsLoading(true);
+      await fetchGames(setGames);
+      setIsLoading(false);
+    };
+    fetchData();
+  }, [setIsLoading]);
 
   const getCellClassName = (params: GridCellParams, idx: number) => {
     return params.row.winnerIdx === idx ? "bg-green-100" : "";

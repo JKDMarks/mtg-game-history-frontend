@@ -20,6 +20,8 @@ type NewDeckDialogProps = {
   setNewDeckPlayer: (player: Player) => void;
   handleClose: () => void;
   handleSubmit: (e: React.FormEvent) => void;
+  errorMsg: string;
+  isSmOrSmaller: boolean;
 };
 
 export default function NewDeckDialog({
@@ -31,6 +33,8 @@ export default function NewDeckDialog({
   setNewDeckPlayer,
   handleClose,
   handleSubmit,
+  errorMsg: parentErrorMsg,
+  isSmOrSmaller,
 }: NewDeckDialogProps) {
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -53,17 +57,23 @@ export default function NewDeckDialog({
   };
 
   return (
-    <Dialog open={open} onClose={resetErrorsAndClose} maxWidth="xs">
+    <Dialog
+      open={open}
+      onClose={resetErrorsAndClose}
+      maxWidth="xs"
+      sx={{
+        "& .MuiDialog-container": {
+          alignItems: isSmOrSmaller ? "flex-start" : "",
+        },
+        "& .MuiPaper-root": {
+          marginTop: isSmOrSmaller ? "10px" : "",
+        },
+      }}
+    >
       <form onSubmit={checkErrorsAndSubmit}>
         <DialogTitle>Add a new deck</DialogTitle>
         <DialogContent className="flex flex-col space-y-4">
-          <DialogContentText>
-            Deck names should be in the format
-            <br />
-            [Commander Name] [Short Description]
-            <br />
-            e.g. Atraxa Infect or Korvold Treasure
-          </DialogContentText>
+          <DialogContentText>Add a descriptive deck name!</DialogContentText>
           <Autocomplete
             disableClearable
             id="new-deck-dialog-new-player"
@@ -83,9 +93,10 @@ export default function NewDeckDialog({
             label="New deck name"
             type="text"
           />
-          {errorMsg && (
+          {(errorMsg || parentErrorMsg) && (
             <DialogContentText sx={{ color: "red" }}>
               {errorMsg}
+              {parentErrorMsg}
             </DialogContentText>
           )}
         </DialogContent>

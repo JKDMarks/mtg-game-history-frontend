@@ -16,6 +16,8 @@ type NewPlayerDialogProps = {
   setNewPlayerName: (name: string) => void;
   handleClose: () => void;
   handleSubmit: (e: React.FormEvent) => void;
+  errorMsg: string;
+  isSmOrSmaller: boolean;
 };
 
 export default function NewPlayerDialog({
@@ -24,6 +26,8 @@ export default function NewPlayerDialog({
   setNewPlayerName,
   handleClose,
   handleSubmit,
+  errorMsg: parentErrorMsg,
+  isSmOrSmaller,
 }: NewPlayerDialogProps) {
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -46,25 +50,36 @@ export default function NewPlayerDialog({
   };
 
   return (
-    <Dialog open={open} onClose={resetErrorsAndClose} maxWidth="xs">
+    <Dialog
+      open={open}
+      onClose={resetErrorsAndClose}
+      maxWidth="xs"
+      sx={{
+        "& .MuiDialog-container": {
+          alignItems: isSmOrSmaller ? "flex-start" : "",
+        },
+        "& .MuiPaper-root": {
+          marginTop: isSmOrSmaller ? "10px" : "",
+        },
+      }}
+    >
       <form onSubmit={(e) => checkErrorsAndSubmit(e)}>
         <DialogTitle>Add a new player</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Remember to add the player's last name or last initial!
-          </DialogContentText>
+          <DialogContentText>Your excuse to ask for names!</DialogContentText>
           <TextField
             autoFocus
             id="new-player-dialog-new-name"
             value={newPlayerName}
             onChange={(event) => setNewPlayerName(event.target.value)}
-            label="name"
+            label="New player name"
             type="text"
             sx={{ width: "100%" }}
           />
-          {errorMsg && (
+          {(errorMsg || parentErrorMsg) && (
             <DialogContentText sx={{ color: "red" }}>
               {errorMsg}
+              {parentErrorMsg}
             </DialogContentText>
           )}
         </DialogContent>

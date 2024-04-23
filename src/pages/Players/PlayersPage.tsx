@@ -1,14 +1,21 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { PageWrapper } from "../../components";
 import { PlayerWithDecks, fetchPlayers } from "../../helpers";
 import { Box, Grid, Link, Typography } from "@mui/material";
+import { IsLoadingContext } from "../../App";
 
 export default function PlayersPage() {
+  const { setIsLoading } = useContext(IsLoadingContext);
   const [players, setPlayers] = useState<PlayerWithDecks[]>([]);
 
   useEffect(() => {
-    fetchPlayers(setPlayers);
-  }, []);
+    const fetchData = async () => {
+      setIsLoading(true);
+      await fetchPlayers(setPlayers);
+      setIsLoading(false);
+    };
+    fetchData();
+  }, [setIsLoading]);
 
   return (
     <PageWrapper>

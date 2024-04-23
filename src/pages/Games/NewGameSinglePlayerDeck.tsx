@@ -2,6 +2,7 @@ import {
   Autocomplete,
   Box,
   Grid,
+  Popper,
   Switch,
   TextField,
   createFilterOptions,
@@ -64,7 +65,7 @@ export default function NewGameSinglePlayerDeck({
       : orderedPlayerIds.indexOf(d1.player.id) -
         orderedPlayerIds.indexOf(d2.player.id)
   );
-  const minHeight = "200px";
+  const minHeight = "0";
 
   const scrollIntoView: React.FocusEventHandler = ({ target }) => {
     const domRect = target.getBoundingClientRect();
@@ -136,6 +137,10 @@ export default function NewGameSinglePlayerDeck({
           }
           return filtered as Player[];
         }}
+        // Popper position bottom
+        PopperComponent={({ style, ...props }) => (
+          <Popper {...props} style={{ ...style, height: 0 }} />
+        )}
       />
       <Autocomplete
         noOptionsText="Start typing to add a new deck"
@@ -197,6 +202,10 @@ export default function NewGameSinglePlayerDeck({
           }
           return filtered as Deck[];
         }}
+        // Popper position bottom
+        PopperComponent={({ style, ...props }) => (
+          <Popper {...props} style={{ ...style, height: 0 }} />
+        )}
       />
       <SinglePlayerDeckCards
         cards={newPlayerDeck.cards}

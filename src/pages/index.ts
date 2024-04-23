@@ -4,3 +4,4 @@ export * from "./Games";
 export * from "./Home";
 export * from "./Decks";
 export * from "./Players";
+export * from "./Profile";

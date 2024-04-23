@@ -12,8 +12,9 @@ import {
   useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useNavigate, useRouteLoaderData } from "react-router-dom";
-import { User, callAPI } from "../helpers";
+import ErrorIcon from "@mui/icons-material/Error";
+import { useRouteLoaderData } from "react-router-dom";
+import { User, USER_LEVEL } from "../helpers";
 import { ROOT_ROUTE_ID } from "../App";
 import { useState } from "react";
 
@@ -25,7 +26,10 @@ export default function PageWrapper({
   children: JSX.Element | JSX.Element[];
 }) {
   const currUser = useRouteLoaderData(ROOT_ROUTE_ID) as User;
-  const navigate = useNavigate();
+  const isLoggedIn = !!currUser && currUser.id && currUser.id > 0;
+  const navigate = (url: string) => {
+    window.location.href = window.location.origin + url;
+  };
 
   const theme = useTheme();
   const isMdOrLarger = useMediaQuery(theme.breakpoints.up("md"));
@@ -41,20 +45,14 @@ export default function PageWrapper({
   };
 
   const createNewGamePage: AppBarPage = {
-    label: "New Game",
+    label: "Record a Game",
     link: "/games/new",
   };
   const gamesPage: AppBarPage = { label: "All Games", link: "/games" };
   const playersPage: AppBarPage = { label: "Players", link: "/players" };
   // const decksPage: AppBarPage = { label: "Decks", link: "/decks" };
-  const myProfilePage: AppBarPage = {
-    label: "My Profile",
-    link: `/users/${currUser.id}`,
-  };
+
   const appBarPages: AppBarPage[] = [createNewGamePage, gamesPage, playersPage];
-  if (!isMdOrLarger) {
-    appBarPages.push(myProfilePage);
-  }
 
   const LINK_STYLING = { color: "white", textDecoration: "none" };
 
@@ -124,19 +122,43 @@ export default function PageWrapper({
               sx={{ flexGrow: 0 }}
               className="flex flex-row space-x-10 align-center"
             >
-              {isMdOrLarger ? (
-                <Link href={`/users/${currUser.id}`} sx={{ ...LINK_STYLING }}>
+              {isLoggedIn && (
+                <Link
+                  href={`/profile`}
+                  sx={{
+                    ...LINK_STYLING,
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  {currUser.user_level <= USER_LEVEL.RESTRICTED && (
+                    <ErrorIcon color="error" sx={{ marginRight: "2px" }} />
+                  )}
                   {currUser.username}
                 </Link>
-              ) : null}
-              <Link
-                href="/login"
-                onClick={() => callAPI("/auth/logout")}
-                className="font-black"
-                sx={{ ...LINK_STYLING, fontWeight: "bold" }}
-              >
-                Logout
-              </Link>
+              )}
+              {/* {isLoggedIn &&
+                currUser?.user_level >= USER_LEVEL.REGULAR_USER && (
+                  <Link
+                    href="/login"
+                    onClick={() => callAPI("/auth/logout")}
+                    className="font-black"
+                    sx={{ ...LINK_STYLING, fontWeight: "bold" }}
+                  >
+                    Logout
+                  </Link>
+                )} */}
+              {!isLoggedIn && (
+                <Link
+                  href="/login"
+                  onClick={() => navigate("/")}
+                  className="font-black"
+                  sx={{ ...LINK_STYLING, fontWeight: "bold" }}
+                >
+                  Login
+                </Link>
+              )}
             </Box>
           </Toolbar>
         </Container>

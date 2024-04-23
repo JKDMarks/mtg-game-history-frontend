@@ -91,7 +91,9 @@ export const fetchDecks = async (setDecks: (decks: Deck[]) => void) => {
 export const fetchGames = async (setGames: (games: Game[]) => void) => {
   const resp = await callAPI("/games");
   const games: Game[] = await resp.json();
-  setGames(games);
+  if (games?.length > 0) {
+    setGames(games);
+  }
 };
 
 export const fetchAllCardNames = async () => {
