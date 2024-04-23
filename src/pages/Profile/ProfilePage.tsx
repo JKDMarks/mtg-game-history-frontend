@@ -79,8 +79,8 @@ export default function ProfilePage() {
               variant="contained"
               color="error"
               sx={{ width: "200px" }}
-              onClick={() => {
-                callAPI("/auth/logout");
+              onClick={async () => {
+                await callAPI("/auth/logout");
                 window.location.href = window.location.origin;
               }}
             >
