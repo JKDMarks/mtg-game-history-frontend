@@ -81,8 +81,9 @@ export default function NewGameSinglePlayerDeck({
     maxHeight: "200px",
   };
 
-  const scrollIntoView: React.FocusEventHandler = ({ target }) => {
-    const domRect = target.getBoundingClientRect();
+  const scrollIntoView = (event: React.FocusEvent<HTMLDivElement>) => {
+    event.target.focus({ preventScroll: true });
+    const domRect = event.target.getBoundingClientRect();
     const eltDistToTopOfScreen = domRect.top;
     window.scrollTo({ top: window.scrollY + eltDistToTopOfScreen });
   };
