@@ -16,7 +16,6 @@ import {
   SetNewPlayerDeckFunctionType,
 } from "../../helpers";
 import SinglePlayerDeckCards from "./SinglePlayerDeckCards";
-import { useState } from "react";
 
 const playerFilter = createFilterOptions<Player>();
 const deckFilter = createFilterOptions<Deck>();
@@ -55,8 +54,8 @@ export default function NewGameSinglePlayerDeck({
   openNewPlayerDialog,
   openNewDeckDialog,
 }: NewGameSinglePlayerDeckProps) {
-  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
-  const [isDeckOpen, setIsDeckOpen] = useState(false);
+  // const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  // const [isDeckOpen, setIsDeckOpen] = useState(false);
 
   const currPlayerId = newPlayerDeck.player.id;
   const orderedPlayerIds = [
@@ -81,15 +80,15 @@ export default function NewGameSinglePlayerDeck({
     maxHeight: "200px",
   };
 
-  const scrollIntoView = (event: React.FocusEvent<HTMLDivElement>) => {
-    // event.stopPropagation();
-    // event.target.focus({ preventScroll: true });
-    const domRect = event.target.getBoundingClientRect();
-    const eltDistToTopOfScreen = domRect.top;
-    setTimeout(() => {
-      window.scrollTo({ top: window.scrollY + eltDistToTopOfScreen });
-    }, 200);
-  };
+  // const scrollIntoView = (event: React.FocusEvent<HTMLDivElement>) => {
+  //   // event.stopPropagation();
+  //   // event.target.focus({ preventScroll: true });
+  //   const domRect = event.target.getBoundingClientRect();
+  //   const eltDistToTopOfScreen = domRect.top;
+  //   setTimeout(() => {
+  //     window.scrollTo({ top: window.scrollY + eltDistToTopOfScreen });
+  //   }, 500);
+  // };
 
   return (
     <Grid item xs={1}>
@@ -105,16 +104,16 @@ export default function NewGameSinglePlayerDeck({
       </Box>
       <Autocomplete
         // open/close
-        open={isPlayerOpen}
-        onOpen={() => setIsPlayerOpen(true)}
-        onClose={() => setIsPlayerOpen(false)}
-        onMouseDownCapture={(e) => e.stopPropagation()}
-        onFocus={(e) => {
-          setIsPlayerOpen(true);
-          scrollIntoView(e);
-        }}
+        // open={isPlayerOpen}
+        // onOpen={() => setIsPlayerOpen(true)}
+        // onClose={() => setIsPlayerOpen(false)}
+        // onMouseDownCapture={(e) => e.stopPropagation()}
+        // onFocus={(e) => {
+        //   setIsPlayerOpen(true);
+        //   scrollIntoView(e);
+        // }}
         selectOnFocus={false}
-        onBlur={() => setIsPlayerOpen(false)}
+        // onBlur={() => setIsPlayerOpen(false)}
         // styling
         className="mb-4"
         noOptionsText="Start typing to add a new player"
@@ -154,7 +153,7 @@ export default function NewGameSinglePlayerDeck({
           ) {
             openNewPlayerDialog(option.inputValue, index);
           } else {
-            setIsPlayerOpen(false);
+            // setIsPlayerOpen(false);
             setNewPlayerDeck({ player: option });
           }
         }}
@@ -174,17 +173,17 @@ export default function NewGameSinglePlayerDeck({
       />
       <Autocomplete
         // open/close
-        open={isDeckOpen}
         disabled={currPlayerId < 0}
-        onOpen={() => setIsDeckOpen(true)}
-        onClose={() => setIsDeckOpen(false)}
-        onMouseDownCapture={(e) => e.stopPropagation()}
-        onFocus={(e) => {
-          setIsDeckOpen(true);
-          scrollIntoView(e);
-        }}
+        // open={isDeckOpen}
+        // onOpen={() => setIsDeckOpen(true)}
+        // onClose={() => setIsDeckOpen(false)}
+        // onMouseDownCapture={(e) => e.stopPropagation()}
+        // onFocus={(e) => {
+        //   setIsDeckOpen(true);
+        //   scrollIntoView(e);
+        // }}
         selectOnFocus={false}
-        onBlur={() => setIsDeckOpen(false)}
+        // onBlur={() => setIsDeckOpen(false)}
         // styling
         noOptionsText="Start typing to add a new deck"
         clearIcon={null}
@@ -231,6 +230,7 @@ export default function NewGameSinglePlayerDeck({
           ) {
             openNewDeckDialog(newPlayerDeck.player, option.inputValue, index);
           } else {
+            // setIsDeckOpen(false);
             setNewPlayerDeck({ deck: option });
           }
         }}
