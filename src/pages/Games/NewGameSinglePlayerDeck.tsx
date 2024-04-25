@@ -82,10 +82,13 @@ export default function NewGameSinglePlayerDeck({
   };
 
   const scrollIntoView = (event: React.FocusEvent<HTMLDivElement>) => {
+    event.stopPropagation();
     event.target.focus({ preventScroll: true });
     const domRect = event.target.getBoundingClientRect();
     const eltDistToTopOfScreen = domRect.top;
+    // setTimeout(() => {
     window.scrollTo({ top: window.scrollY + eltDistToTopOfScreen });
+    // }, 50);
   };
 
   return (
