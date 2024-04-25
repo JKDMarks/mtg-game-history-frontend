@@ -42,8 +42,8 @@ const router = createBrowserRouter(
           //     return redirect("/login");
           //   }
           // }
-          const resp2 = await callAPI("/me");
-          return await resp2.json();
+          const resp = await callAPI("/me");
+          return await resp.json();
         }
       }
     >
@@ -92,11 +92,11 @@ function App() {
       {isLoading && (
         <div
           style={{
-            position: "absolute",
+            position: "fixed",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            zIndex: 99,
+            zIndex: 2147483647,
           }}
         >
           <img

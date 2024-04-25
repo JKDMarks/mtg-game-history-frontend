@@ -16,6 +16,7 @@ import {
   SetNewPlayerDeckFunctionType,
 } from "../../helpers";
 import SinglePlayerDeckCards from "./SinglePlayerDeckCards";
+import { useState } from "react";
 
 const playerFilter = createFilterOptions<Player>();
 const deckFilter = createFilterOptions<Deck>();
@@ -54,6 +55,9 @@ export default function NewGameSinglePlayerDeck({
   openNewPlayerDialog,
   openNewDeckDialog,
 }: NewGameSinglePlayerDeckProps) {
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const [isDeckOpen, setIsDeckOpen] = useState(false);
+
   const currPlayerId = newPlayerDeck.player.id;
   const orderedPlayerIds = [
     currPlayerId,
@@ -65,7 +69,17 @@ export default function NewGameSinglePlayerDeck({
       : orderedPlayerIds.indexOf(d1.player.id) -
         orderedPlayerIds.indexOf(d2.player.id)
   );
-  const minHeight = "0";
+
+  const PLAYER_LISTBOX_STYLING = {
+    height: `${16 + 48 * players.length}px`,
+    minHeight: "64px",
+    maxHeight: "200px",
+  };
+  const DECK_LISTBOX_STYLING = {
+    height: `${64 + 48 * decks.length}px`,
+    minHeight: "112px",
+    maxHeight: "200px",
+  };
 
   const scrollIntoView: React.FocusEventHandler = ({ target }) => {
     const domRect = target.getBoundingClientRect();
@@ -86,12 +100,25 @@ export default function NewGameSinglePlayerDeck({
         </Box>
       </Box>
       <Autocomplete
+        // open/close
+        open={isPlayerOpen}
+        onOpen={() => setIsPlayerOpen(true)}
+        onClose={() => setIsPlayerOpen(false)}
+        onMouseDownCapture={(e) => e.stopPropagation()}
+        onFocus={(e) => {
+          setIsPlayerOpen(true);
+          scrollIntoView(e);
+        }}
+        selectOnFocus={false}
+        onBlur={() => setIsPlayerOpen(false)}
+        // styling
         className="mb-4"
         noOptionsText="Start typing to add a new player"
-        ListboxProps={{ style: { minHeight } }}
-        selectOnFocus={false}
-        onFocus={scrollIntoView}
-        options={players}
+        clearIcon={null}
+        ListboxProps={{ style: { ...PLAYER_LISTBOX_STYLING } }}
+        PopperComponent={({ style, ...props }) => (
+          <Popper {...props} style={{ ...style, height: 0 }} />
+        )}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -99,7 +126,11 @@ export default function NewGameSinglePlayerDeck({
             error={!!errors.playerDecks[index]?.player}
           />
         )}
+        // functionality
+        options={players}
+        value={currPlayerId > 0 ? newPlayerDeck.player : null}
         isOptionEqualToValue={(option, value) => option.id === value.id}
+        getOptionDisabled={(player) => selectedPlayerIds.has(player.id)}
         getOptionLabel={(option) => {
           if ("label" in option && typeof option.label === "string") {
             return option.label;
@@ -109,8 +140,6 @@ export default function NewGameSinglePlayerDeck({
           }
           return "please report this bug";
         }}
-        value={currPlayerId > 0 ? newPlayerDeck.player : null}
-        getOptionDisabled={(player) => selectedPlayerIds.has(player.id)}
         onChange={(_, option) => {
           if (typeof option === "string") {
             openNewPlayerDialog(option, index);
@@ -121,6 +150,7 @@ export default function NewGameSinglePlayerDeck({
           ) {
             openNewPlayerDialog(option.inputValue, index);
           } else {
+            setIsPlayerOpen(false);
             setNewPlayerDeck({ player: option });
           }
         }}
@@ -137,18 +167,27 @@ export default function NewGameSinglePlayerDeck({
           }
           return filtered as Player[];
         }}
-        // Popper position bottom
+      />
+      <Autocomplete
+        // open/close
+        open={isDeckOpen}
+        disabled={currPlayerId < 0}
+        onOpen={() => setIsDeckOpen(true)}
+        onClose={() => setIsDeckOpen(false)}
+        onMouseDownCapture={(e) => e.stopPropagation()}
+        onFocus={(e) => {
+          setIsDeckOpen(true);
+          scrollIntoView(e);
+        }}
+        selectOnFocus={false}
+        onBlur={() => setIsDeckOpen(false)}
+        // styling
+        noOptionsText="Start typing to add a new deck"
+        clearIcon={null}
+        ListboxProps={{ style: { ...DECK_LISTBOX_STYLING } }}
         PopperComponent={({ style, ...props }) => (
           <Popper {...props} style={{ ...style, height: 0 }} />
         )}
-      />
-      <Autocomplete
-        noOptionsText="Start typing to add a new deck"
-        ListboxProps={{ style: { minHeight } }}
-        selectOnFocus={false}
-        onFocus={scrollIntoView}
-        disabled={currPlayerId < 0}
-        options={orderedDecks}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -156,7 +195,11 @@ export default function NewGameSinglePlayerDeck({
             error={!!errors.playerDecks[index]?.deck}
           />
         )}
+        // functionality
+        options={orderedDecks}
+        value={newPlayerDeck.deck.id > 0 ? newPlayerDeck.deck : null}
         isOptionEqualToValue={(option, value) => option.id === value.id}
+        getOptionDisabled={(deck) => selectedDeckIds.has(deck.id)}
         getOptionLabel={(option) => {
           if ("label" in option && typeof option.label === "string") {
             return option.label;
@@ -174,8 +217,6 @@ export default function NewGameSinglePlayerDeck({
             ? `${newPlayerDeck.player.name}'s own decks`
             : "Other players' decks";
         }}
-        value={newPlayerDeck.deck.id > 0 ? newPlayerDeck.deck : null}
-        getOptionDisabled={(deck) => selectedDeckIds.has(deck.id)}
         onChange={(_, option) => {
           if (typeof option === "string") {
             openNewDeckDialog(newPlayerDeck.player, option, index);
@@ -202,10 +243,6 @@ export default function NewGameSinglePlayerDeck({
           }
           return filtered as Deck[];
         }}
-        // Popper position bottom
-        PopperComponent={({ style, ...props }) => (
-          <Popper {...props} style={{ ...style, height: 0 }} />
-        )}
       />
       <SinglePlayerDeckCards
         cards={newPlayerDeck.cards}

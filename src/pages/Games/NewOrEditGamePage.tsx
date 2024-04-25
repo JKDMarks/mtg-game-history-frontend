@@ -185,15 +185,18 @@ export default function NewOrEditGamePage({
   const handleSubmitNewPlayerDialog = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
+    setIsLoading(true);
     const resp = await callAPI("/players", {
       method: "POST",
       body: { name: newPlayerDialogPlayerName },
     });
     const newPlayer = await resp.json();
+    setIsLoading(false);
     if (newPlayer.message) {
       setErrorMsg(newPlayer.message);
       return;
     }
+    setTimeout(() => (document.activeElement as HTMLElement)?.blur(), 100);
     const tempNewPDs = [...newPlayerDecks];
     tempNewPDs[newPlayerDialogOpenedFromIndex].player = newPlayer;
     setNewPlayerDecks(tempNewPDs);
@@ -234,6 +237,7 @@ export default function NewOrEditGamePage({
   const handleSubmitNewDeckDialog = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
+    setIsLoading(true);
     const resp = await callAPI("/decks", {
       method: "POST",
       body: {
@@ -242,10 +246,12 @@ export default function NewOrEditGamePage({
       },
     });
     const newDeck = await resp.json();
+    setIsLoading(false);
     if (newDeck.message) {
       setErrorMsg(newDeck.message);
       return;
     }
+    setTimeout(() => (document.activeElement as HTMLElement)?.blur(), 100);
     const tempNewPDs = [...newPlayerDecks];
     tempNewPDs[newDeckDialogOpenedFromIndex].deck = newDeck;
     fetchDecks(setDecks);

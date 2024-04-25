@@ -60,6 +60,7 @@ export default function NewPlayerDialog({
         },
         "& .MuiPaper-root": {
           marginTop: isSmOrSmaller ? "10px" : "",
+          maxHeight: "calc(100% - 20px)",
         },
       }}
     >

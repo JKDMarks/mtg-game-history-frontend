@@ -67,6 +67,7 @@ export default function NewDeckDialog({
         },
         "& .MuiPaper-root": {
           marginTop: isSmOrSmaller ? "10px" : "",
+          maxHeight: "calc(100% - 20px)",
         },
       }}
     >
