@@ -14,7 +14,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useRouteLoaderData } from "react-router-dom";
-import { User, USER_LEVEL } from "../helpers";
+import { ChildrenPropType, User, USER_LEVEL } from "../helpers";
 import { ROOT_ROUTE_ID } from "../App";
 import { useState } from "react";
 
@@ -23,7 +23,7 @@ type AppBarPage = { label: string; link: string; isImportant?: boolean };
 export default function PageWrapper({
   children,
 }: {
-  children: JSX.Element | JSX.Element[];
+  children: ChildrenPropType;
 }) {
   const currUser = useRouteLoaderData(ROOT_ROUTE_ID) as User;
   const isLoggedIn = !!currUser && currUser.id && currUser.id > 0;

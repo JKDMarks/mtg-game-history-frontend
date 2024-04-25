@@ -1,3 +1,5 @@
+export type ChildrenPropType = JSX.Element | JSX.Element[];
+
 export interface User {
   id: number;
   username: string;

@@ -1,11 +1,15 @@
+import { useEffect, useState } from "react";
+import { isMobile } from "react-device-detect";
 import {
-  Autocomplete,
   Box,
+  FormControl,
   Grid,
-  Popper,
+  InputLabel,
+  ListSubheader,
+  MenuItem,
+  NativeSelect,
+  Select,
   Switch,
-  TextField,
-  createFilterOptions,
 } from "@mui/material";
 import {
   Card,
@@ -16,9 +20,6 @@ import {
   SetNewPlayerDeckFunctionType,
 } from "../../helpers";
 import SinglePlayerDeckCards from "./SinglePlayerDeckCards";
-
-const playerFilter = createFilterOptions<Player>();
-const deckFilter = createFilterOptions<Deck>();
 
 type NewGameSinglePlayerDeckProps = {
   index: number;
@@ -35,10 +36,10 @@ type NewGameSinglePlayerDeckProps = {
   openNewDeckDialog: (player: Player, deckName: string, index: number) => void;
 };
 
-type AutocompleteOption = {
-  inputValue: string;
-  label: string;
-};
+interface SimplePlayer {
+  name: string;
+  decks: Deck[];
+}
 
 export default function NewGameSinglePlayerDeck({
   index,
@@ -54,200 +55,253 @@ export default function NewGameSinglePlayerDeck({
   openNewPlayerDialog,
   openNewDeckDialog,
 }: NewGameSinglePlayerDeckProps) {
-  // const [isPlayerOpen, setIsPlayerOpen] = useState(false);
-  // const [isDeckOpen, setIsDeckOpen] = useState(false);
-
   const currPlayerId = newPlayerDeck.player.id;
-  const orderedPlayerIds = [
-    currPlayerId,
-    ...players.map((player) => player.id),
-  ];
-  const orderedDecks = [...decks].sort((d1, d2) =>
-    currPlayerId < 0
-      ? 0
-      : orderedPlayerIds.indexOf(d1.player.id) -
-        orderedPlayerIds.indexOf(d2.player.id)
-  );
 
-  const PLAYER_LISTBOX_STYLING = {
-    height: `${16 + 48 * players.length}px`,
-    minHeight: "64px",
-    maxHeight: "200px",
-  };
-  const DECK_LISTBOX_STYLING = {
-    height: `${64 + 48 * decks.length}px`,
-    minHeight: "112px",
-    maxHeight: "200px",
-  };
+  const [orderedPlayerIds, setOrderedPlayerIds] = useState<Array<number>>([]);
+  const [orderedDeckObj, setOrderedDeckObj] = useState<
+    Record<number, SimplePlayer>
+  >({});
 
-  // const scrollIntoView = (event: React.FocusEvent<HTMLDivElement>) => {
-  //   // event.stopPropagation();
-  //   // event.target.focus({ preventScroll: true });
-  //   const domRect = event.target.getBoundingClientRect();
-  //   const eltDistToTopOfScreen = domRect.top;
-  //   setTimeout(() => {
-  //     window.scrollTo({ top: window.scrollY + eltDistToTopOfScreen });
-  //   }, 500);
-  // };
+  useEffect(() => {
+    const orderedPlayerIds = [
+      currPlayerId,
+      ...players.reduce<Array<number>>((acc, player) => {
+        if (player.id !== currPlayerId) {
+          acc.push(player.id);
+        }
+        return acc;
+      }, []),
+    ];
+    const orderedDeckObj = decks.reduce<Record<number, SimplePlayer>>(
+      (deckObj, deck) => {
+        const { id: playerId, name: playerName } = deck.player;
+        if (playerId in deckObj) {
+          deckObj[playerId].decks.push(deck);
+        } else {
+          deckObj[playerId] = { name: playerName, decks: [deck] };
+        }
+        return deckObj;
+      },
+      {}
+    );
+    setOrderedPlayerIds(orderedPlayerIds);
+    setOrderedDeckObj(orderedDeckObj);
+  }, [currPlayerId, players, decks]);
+
+  const ADD_PLAYER_VALUE = "__ADD_PLAYER";
+  const ADD_DECK_VALUE = "__ADD_DECK";
 
   return (
     <Grid item xs={1}>
       <Box>
-        <Box>Player {index + 1}</Box>
+        {/* <Box>Player {index + 1}</Box> */}
         <Box className="flex flex-row justify-center items-center">
-          <Box>Winner</Box>
+          <Box>Player {index + 1} Winner</Box>
           <Switch
             checked={isWinner}
             onChange={(_, checked) => handleChangeIsWinnerSwitch(checked)}
           />
         </Box>
       </Box>
-      <Autocomplete
-        // open/close
-        // open={isPlayerOpen}
-        // onOpen={() => setIsPlayerOpen(true)}
-        // onClose={() => setIsPlayerOpen(false)}
-        // onMouseDownCapture={(e) => e.stopPropagation()}
-        // onFocus={(e) => {
-        //   setIsPlayerOpen(true);
-        //   scrollIntoView(e);
-        // }}
-        selectOnFocus={false}
-        // onBlur={() => setIsPlayerOpen(false)}
-        // styling
-        className="mb-4"
-        noOptionsText="Start typing to add a new player"
-        clearIcon={null}
-        ListboxProps={{ style: { ...PLAYER_LISTBOX_STYLING } }}
-        PopperComponent={({ style, ...props }) => (
-          <Popper {...props} style={{ ...style, height: 0 }} />
+
+      {/* PLAYER SELECT */}
+      <FormControl sx={{ width: "100%" }}>
+        {isMobile ? (
+          <>
+            <InputLabel variant="standard" htmlFor={`player-${index}`}>
+              Player {index + 1}
+            </InputLabel>
+            <NativeSelect
+              // styling
+              className="mb-3"
+              sx={{ width: "100%" }}
+              inputProps={{
+                name: `player-${index + 1}-select`,
+                id: `player-${index}`,
+              }}
+              // functionality
+              error={!!errors.playerDecks[index]?.player}
+              value={currPlayerId > 0 ? newPlayerDeck.player.id : ""}
+              onChange={({ target: { value } }) => {
+                if (value === "") {
+                  setNewPlayerDeck({ player: null });
+                } else if (value === ADD_PLAYER_VALUE) {
+                  openNewPlayerDialog("", index);
+                } else {
+                  setNewPlayerDeck({
+                    player: players.find(
+                      (player) => player.id === Number(value)
+                    ),
+                  });
+                }
+              }}
+            >
+              <option disabled value=""></option>
+              <option value={ADD_PLAYER_VALUE}>➕ Add a new player</option>
+              {players.map((player, i) => (
+                <option
+                  key={`select-${index}-player-${i}`}
+                  value={player.id}
+                  disabled={selectedPlayerIds.has(player.id)}
+                >
+                  {player.name}
+                </option>
+              ))}
+            </NativeSelect>
+          </>
+        ) : (
+          <>
+            <InputLabel id={`player-${index}`}>Player {index + 1}</InputLabel>
+            <Select
+              // styling
+              label="Player"
+              labelId={`player-${index}`}
+              className="mb-3"
+              sx={{ width: "100%" }}
+              // functionality
+              error={!!errors.playerDecks[index]?.player}
+              // value
+              value={currPlayerId > 0 ? newPlayerDeck.player.id : ""}
+              onChange={({ target: { value } }) => {
+                if (value === ADD_PLAYER_VALUE) {
+                  openNewPlayerDialog("", index);
+                } else {
+                  setNewPlayerDeck({
+                    player: players.find((player) => player.id === value),
+                  });
+                }
+              }}
+            >
+              <MenuItem value={ADD_PLAYER_VALUE}>➕ Add a new player</MenuItem>
+              {players.map((player, i) => (
+                <MenuItem
+                  key={`select-${index}-player-${i}`}
+                  value={player.id}
+                  disabled={selectedPlayerIds.has(player.id)}
+                >
+                  {player.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </>
         )}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Player"
-            error={!!errors.playerDecks[index]?.player}
-          />
+      </FormControl>
+
+      {/* DECK SELECT */}
+      <FormControl sx={{ width: "100%" }}>
+        {isMobile ? (
+          <>
+            <InputLabel variant="standard" htmlFor={`deck-${index}`}>
+              Deck {index + 1}
+            </InputLabel>
+            <NativeSelect
+              // styling
+              inputProps={{
+                name: `deck-${index + 1}-select`,
+                id: `deck-${index}`,
+              }}
+              className="mb-3"
+              sx={{ width: "100%" }}
+              // functionality
+              disabled={currPlayerId < 0}
+              error={!!errors.playerDecks[index]?.deck}
+              // value
+              value={newPlayerDeck.deck.id > 0 ? newPlayerDeck.deck.id : ""}
+              onChange={({ target: { value } }) => {
+                if (value === ADD_DECK_VALUE) {
+                  openNewDeckDialog(newPlayerDeck.player, "", index);
+                } else {
+                  setNewPlayerDeck({
+                    deck: decks.find((deck) => deck.id === Number(value)),
+                  });
+                }
+              }}
+            >
+              <option disabled value=""></option>
+              <option value={ADD_DECK_VALUE}>➕ Add a new deck</option>
+              {Object.keys(orderedDeckObj).length > 0 &&
+                orderedPlayerIds.map(
+                  (playerId) =>
+                    !!orderedDeckObj[playerId] && [
+                      <optgroup
+                        key={`select-${index}subheader-player-id-${playerId}`}
+                        label={
+                          playerId === currPlayerId
+                            ? `${orderedDeckObj[playerId].name}'s own decks`
+                            : orderedDeckObj[playerId].name
+                        }
+                      >
+                        {orderedDeckObj[playerId].decks.map((deck) => (
+                          <option
+                            key={`select-${index}-deck-${deck.id}`}
+                            value={deck.id}
+                            disabled={selectedDeckIds.has(deck.id)}
+                          >
+                            {playerId !== currPlayerId &&
+                              `${deck.player.name}'s `}
+                            {deck.name}
+                          </option>
+                        ))}
+                      </optgroup>,
+                    ]
+                )}
+            </NativeSelect>
+          </>
+        ) : (
+          <>
+            <InputLabel id={`deck-${index}`}>Deck {index + 1}</InputLabel>
+            <Select
+              // styling
+              label="Deck"
+              labelId={`deck-${index}`}
+              className="mb-3"
+              sx={{ width: "100%" }}
+              // functionality
+              disabled={currPlayerId < 0}
+              error={!!errors.playerDecks[index]?.deck}
+              // value
+              value={newPlayerDeck.deck.id > 0 ? newPlayerDeck.deck.id : ""}
+              onChange={({ target: { value } }) => {
+                if (value === ADD_DECK_VALUE) {
+                  openNewDeckDialog(newPlayerDeck.player, "", index);
+                } else {
+                  setNewPlayerDeck({
+                    deck: decks.find((deck) => deck.id === value),
+                  });
+                }
+              }}
+            >
+              <MenuItem value={ADD_DECK_VALUE}>➕ Add a new deck</MenuItem>
+              {Object.keys(orderedDeckObj).length > 0 &&
+                orderedPlayerIds.map(
+                  (playerId) =>
+                    !!orderedDeckObj[playerId] && [
+                      <ListSubheader
+                        key={`select-${index}subheader-player-id-${playerId}`}
+                      >
+                        {playerId === currPlayerId
+                          ? `${orderedDeckObj[playerId].name}'s own decks`
+                          : orderedDeckObj[playerId].name}
+                      </ListSubheader>,
+                      ...orderedDeckObj[playerId].decks.map((deck) => (
+                        <MenuItem
+                          key={`select-${index}-deck-${deck.id}`}
+                          value={deck.id}
+                          disabled={selectedDeckIds.has(deck.id)}
+                        >
+                          {playerId !== currPlayerId &&
+                            `${deck.player.name}'s `}
+                          {deck.name}
+                        </MenuItem>
+                      )),
+                    ]
+                )}
+            </Select>
+          </>
         )}
-        // functionality
-        options={players}
-        value={currPlayerId > 0 ? newPlayerDeck.player : null}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        getOptionDisabled={(player) => selectedPlayerIds.has(player.id)}
-        getOptionLabel={(option) => {
-          if ("label" in option && typeof option.label === "string") {
-            return option.label;
-          }
-          if ("name" in option) {
-            return option.name;
-          }
-          return "please report this bug";
-        }}
-        onChange={(_, option) => {
-          if (typeof option === "string") {
-            openNewPlayerDialog(option, index);
-          } else if (
-            option !== null &&
-            "inputValue" in option &&
-            typeof option.inputValue === "string"
-          ) {
-            openNewPlayerDialog(option.inputValue, index);
-          } else {
-            // setIsPlayerOpen(false);
-            setNewPlayerDeck({ player: option });
-          }
-        }}
-        filterOptions={(options, params) => {
-          const filtered: (Player | AutocompleteOption)[] = playerFilter(
-            options,
-            params
-          );
-          if (params.inputValue !== "") {
-            filtered.push({
-              inputValue: params.inputValue,
-              label: `Add new player "${params.inputValue}"`,
-            });
-          }
-          return filtered as Player[];
-        }}
-      />
-      <Autocomplete
-        // open/close
-        disabled={currPlayerId < 0}
-        // open={isDeckOpen}
-        // onOpen={() => setIsDeckOpen(true)}
-        // onClose={() => setIsDeckOpen(false)}
-        // onMouseDownCapture={(e) => e.stopPropagation()}
-        // onFocus={(e) => {
-        //   setIsDeckOpen(true);
-        //   scrollIntoView(e);
-        // }}
-        selectOnFocus={false}
-        // onBlur={() => setIsDeckOpen(false)}
-        // styling
-        noOptionsText="Start typing to add a new deck"
-        clearIcon={null}
-        ListboxProps={{ style: { ...DECK_LISTBOX_STYLING } }}
-        PopperComponent={({ style, ...props }) => (
-          <Popper {...props} style={{ ...style, height: 0 }} />
-        )}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Deck"
-            error={!!errors.playerDecks[index]?.deck}
-          />
-        )}
-        // functionality
-        options={orderedDecks}
-        value={newPlayerDeck.deck.id > 0 ? newPlayerDeck.deck : null}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        getOptionDisabled={(deck) => selectedDeckIds.has(deck.id)}
-        getOptionLabel={(option) => {
-          if ("label" in option && typeof option.label === "string") {
-            return option.label;
-          }
-          if ("name" in option) {
-            return option.player.id === currPlayerId
-              ? option.name
-              : `${option.player.name}'s ${option.name}`;
-          }
-          return "please report this bug";
-        }}
-        groupBy={(deck) => {
-          if ("inputValue" in deck) return "Add new deck";
-          return deck.player.id === currPlayerId
-            ? `${newPlayerDeck.player.name}'s own decks`
-            : "Other players' decks";
-        }}
-        onChange={(_, option) => {
-          if (typeof option === "string") {
-            openNewDeckDialog(newPlayerDeck.player, option, index);
-          } else if (
-            option !== null &&
-            "inputValue" in option &&
-            typeof option.inputValue === "string"
-          ) {
-            openNewDeckDialog(newPlayerDeck.player, option.inputValue, index);
-          } else {
-            // setIsDeckOpen(false);
-            setNewPlayerDeck({ deck: option });
-          }
-        }}
-        filterOptions={(options, params) => {
-          const filtered: (Deck | AutocompleteOption)[] = deckFilter(
-            options,
-            params
-          );
-          if (params.inputValue !== "") {
-            filtered.push({
-              inputValue: params.inputValue,
-              label: `Add new deck "${params.inputValue}"`,
-            });
-          }
-          return filtered as Deck[];
-        }}
-      />
+      </FormControl>
+
+      {/* CARDS SELECT */}
       <SinglePlayerDeckCards
         cards={newPlayerDeck.cards}
         setCards={(cards: Card[]) => setNewPlayerDeck({ cards })}
