@@ -1,23 +1,34 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Box, Button, Link, Typography } from "@mui/material";
 
 import { callAPI, Game } from "../../helpers";
 import { PageWrapper, GamesGrid } from "../../components";
+import { IsLoadingContext } from "../../App";
 
 function HomePage() {
+  const { setIsLoading } = useContext(IsLoadingContext);
+
   const [games, setGames] = useState<Game[]>([]);
 
   useEffect(() => {
     const fetchGames = async () => {
+      setIsLoading(true);
       const resp = await callAPI("/games");
-      const games: Game[] = await resp.json();
+      const games = await resp.json();
       // newest first
-      setGames(
-        [...games].sort((gameA, gameB) => gameB.id - gameA.id).slice(0, 8)
-      );
+
+      if (!games.message) {
+        setGames(
+          [...(games as Game[])]
+            .sort((gameA, gameB) => gameB.id - gameA.id)
+            .slice(0, 8)
+        );
+      }
+      setIsLoading(false);
     };
 
     fetchGames();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
