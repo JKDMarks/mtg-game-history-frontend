@@ -188,7 +188,7 @@ export default function NewOrEditGamePage({
     setIsLoading(true);
     const resp = await callAPI("/players", {
       method: "POST",
-      body: { name: newPlayerDialogPlayerName },
+      body: { name: newPlayerDialogPlayerName.trim() },
     });
     const newPlayer = await resp.json();
     setIsLoading(false);
@@ -242,7 +242,7 @@ export default function NewOrEditGamePage({
       method: "POST",
       body: {
         player_id: newDeckDialogPlayer.id,
-        name: newDeckDialogDeckName,
+        name: newDeckDialogDeckName.trim(),
       },
     });
     const newDeck = await resp.json();
