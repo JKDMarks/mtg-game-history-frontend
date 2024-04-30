@@ -130,6 +130,7 @@ export default function CardNamesAutocomplete({
       options={cardNames}
       ListboxComponent={ListboxComponent}
       onChange={(_, value) => handleChange(value)}
+      selectOnFocus={false}
     />
   );
 }
