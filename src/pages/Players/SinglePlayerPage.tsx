@@ -1,10 +1,12 @@
 import { useParams } from "react-router-dom";
 import { Divider, PageWrapper, GamesGrid } from "../../components";
 import { Grid, Link, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Game, PlayerWithDecks, callAPI, fakePlayer } from "../../helpers";
+import { IsLoadingContext } from "../../App";
 
 export default function SinglePlayerPage() {
+  const { setIsLoading } = useContext(IsLoadingContext);
   const { playerId } = useParams();
 
   const [games, setGames] = useState<Game[]>([]);
@@ -25,9 +27,14 @@ export default function SinglePlayerPage() {
       const games = await resp.json();
       setGames(games);
     };
-    fetchPlayer();
-    fetchGames();
-  }, [playerId]);
+    const fetchData = async () => {
+      setIsLoading(true);
+      await fetchPlayer();
+      await fetchGames();
+      setIsLoading(false);
+    };
+    fetchData();
+  }, [playerId, setIsLoading]);
 
   useEffect(() => {
     const gamesWon = games.filter(

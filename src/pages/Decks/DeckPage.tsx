@@ -1,10 +1,12 @@
 import { useParams } from "react-router-dom";
 import { PageWrapper, GamesGrid } from "../../components";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Deck, Game, callAPI, fakeDeck } from "../../helpers";
 import { Typography } from "@mui/material";
+import { IsLoadingContext } from "../../App";
 
 export default function DeckPage() {
+  const { setIsLoading } = useContext(IsLoadingContext);
   const { deckId } = useParams();
 
   const [deck, setDeck] = useState<Deck>({ ...fakeDeck });
@@ -22,9 +24,14 @@ export default function DeckPage() {
       const games = await resp.json();
       setGames(games);
     };
-    fetchDeck();
-    fetchGames();
-  }, [deckId]);
+    const fetchData = async () => {
+      setIsLoading(true);
+      await fetchDeck();
+      await fetchGames();
+      setIsLoading(false);
+    };
+    fetchData();
+  }, [deckId, setIsLoading]);
 
   useEffect(() => {
     const gamesWon = games.filter(
