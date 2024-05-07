@@ -1,7 +1,9 @@
 import { Box, Button, FormLabel, IconButton, TextField } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Card, fakeCard } from "../../helpers";
-import CardNamesAutocomplete from "./CardNamesAutocomplete";
+import MemoizedAutocomplete from "./MemoizedAutocomplete";
+import { useRouteLoaderData } from "react-router-dom";
+import { GAMES_ROUTE_ID } from "../../App";
 
 interface SinglePlayerDeckCardsProps {
   cards: Card[];
@@ -14,6 +16,8 @@ export default function SinglePlayerDeckCards({
   cards,
   setCards,
 }: SinglePlayerDeckCardsProps) {
+  const cardNames = useRouteLoaderData(GAMES_ROUTE_ID) as string[];
+
   const handleClearClick = (idx: number) => {
     const newCards = [...cards.slice(0, idx), ...cards.slice(idx + 1)];
     setCards(newCards);
@@ -73,8 +77,9 @@ export default function SinglePlayerDeckCards({
           >
             <ClearIcon />
           </IconButton>
-          <CardNamesAutocomplete
-            card={card}
+          <MemoizedAutocomplete
+            value={card.name}
+            options={cardNames}
             handleChange={(value) => handleChangeName(value, idx)}
           />
           <TextField

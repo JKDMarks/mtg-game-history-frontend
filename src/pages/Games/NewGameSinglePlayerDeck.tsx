@@ -136,8 +136,10 @@ export default function NewGameSinglePlayerDeck({
                 }
               }}
             >
-              <option disabled value=""></option>
-              <option value={ADD_PLAYER_VALUE}>➕ Add a new player</option>
+              <option disabled hidden value=""></option>
+              <option value={ADD_PLAYER_VALUE} style={{ color: "red" }}>
+                🆕 Add a new player
+              </option>
               {players.map((player, i) => (
                 <option
                   key={`select-${index}-player-${i}`}
@@ -172,7 +174,7 @@ export default function NewGameSinglePlayerDeck({
                 }
               }}
             >
-              <MenuItem value={ADD_PLAYER_VALUE}>➕ Add a new player</MenuItem>
+              <MenuItem value={ADD_PLAYER_VALUE}>🆕 Add a new player</MenuItem>
               {players.map((player, i) => (
                 <MenuItem
                   key={`select-${index}-player-${i}`}
@@ -217,8 +219,10 @@ export default function NewGameSinglePlayerDeck({
                 }
               }}
             >
-              <option disabled value=""></option>
-              <option value={ADD_DECK_VALUE}>➕ Add a new deck</option>
+              <option disabled hidden value=""></option>
+              <option value={ADD_DECK_VALUE} style={{ color: "red" }}>
+                🆕 Add a new deck
+              </option>
               {Object.keys(orderedDeckObj).length > 0 &&
                 orderedPlayerIds.map(
                   (playerId) =>
@@ -271,7 +275,7 @@ export default function NewGameSinglePlayerDeck({
                 }
               }}
             >
-              <MenuItem value={ADD_DECK_VALUE}>➕ Add a new deck</MenuItem>
+              <MenuItem value={ADD_DECK_VALUE}>🆕 Add a new deck</MenuItem>
               {Object.keys(orderedDeckObj).length > 0 &&
                 orderedPlayerIds.map(
                   (playerId) =>

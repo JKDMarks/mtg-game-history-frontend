@@ -1,5 +1,3 @@
-import { useRouteLoaderData } from "react-router-dom";
-import { GAMES_ROUTE_ID } from "../../App";
 import { ListChildComponentProps, VariableSizeList } from "react-window";
 import {
   Autocomplete,
@@ -10,18 +8,17 @@ import {
   useTheme,
 } from "@mui/material";
 import React from "react";
-import { Card } from "../../helpers";
 import { NAME_WIDTH_PCT } from "./SinglePlayerDeckCards";
 
-export default function CardNamesAutocomplete({
-  card,
+export default function MemoizedAutocomplete({
+  value,
+  options,
   handleChange,
 }: {
-  card: Card;
+  value: string;
+  options: string[];
   handleChange: (value: string | null) => void;
 }) {
-  const cardNames = useRouteLoaderData(GAMES_ROUTE_ID) as string[];
-
   const LISTBOX_PADDING = 8; // px
 
   function renderRow(props: ListChildComponentProps) {
@@ -124,10 +121,10 @@ export default function CardNamesAutocomplete({
 
   return (
     <Autocomplete
-      value={card.name}
+      value={value}
       sx={{ width: `${NAME_WIDTH_PCT}%` }}
       renderInput={(params) => <TextField {...params} />}
-      options={cardNames}
+      options={options}
       ListboxComponent={ListboxComponent}
       onChange={(_, value) => handleChange(value)}
       selectOnFocus={false}
