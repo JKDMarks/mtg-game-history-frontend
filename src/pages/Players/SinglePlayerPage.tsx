@@ -1,8 +1,14 @@
 import { useParams } from "react-router-dom";
 import { Divider, PageWrapper, GamesGrid } from "../../components";
-import { Grid, Link, Typography } from "@mui/material";
+import { Button, Grid, Link, TextField, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import { Game, PlayerWithDecks, callAPI, fakePlayer } from "../../helpers";
+import {
+  Game,
+  NAME_RGX,
+  PlayerWithDecks,
+  callAPI,
+  fakePlayer,
+} from "../../helpers";
 import { IsLoadingContext } from "../../App";
 
 export default function SinglePlayerPage() {
@@ -16,15 +22,19 @@ export default function SinglePlayerPage() {
   });
   const [gameWinCt, setGameWinCt] = useState<number>(0);
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [newPlayerName, setNewPlayerName] = useState("");
+
   useEffect(() => {
     const fetchPlayer = async () => {
       const resp = await callAPI(`/players/${playerId}`);
-      const player = await resp.json();
+      const player = (await resp.json()) as PlayerWithDecks;
       setPlayer(player);
+      setNewPlayerName(player.name);
     };
     const fetchGames = async () => {
       const resp = await callAPI(`/games/player/${playerId}`);
-      const games = await resp.json();
+      const games = (await resp.json()) as Game[];
       setGames(games);
     };
     const fetchData = async () => {
@@ -45,13 +55,65 @@ export default function SinglePlayerPage() {
     setGameWinCt(gamesWon.length);
   }, [games, player]);
 
+  const handleChangeNewName: React.ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement
+  > = (e) => {
+    setNewPlayerName(e.target.value);
+  };
+
+  const handleSubmitNewName: React.MouseEventHandler = async () => {
+    if (!newPlayerName.match(NAME_RGX)) {
+      window.alert("Invalid deck name");
+      return;
+    }
+
+    const resp = await callAPI("/players/" + player.id + "/edit", {
+      method: "POST",
+      body: { name: newPlayerName },
+    });
+    const json = await resp.json();
+    if (json.success === true) {
+      window.location.reload();
+    } else {
+      window.alert(json.message);
+    }
+  };
+
   return (
     <PageWrapper>
       {player.id > 0 ? (
         <>
-          <Typography variant="h5" className="underline">
-            {player.name}
-          </Typography>
+          {isEditing ? (
+            <TextField
+              size="small"
+              value={newPlayerName}
+              onChange={handleChangeNewName}
+            />
+          ) : (
+            <Typography variant="h5" className="underline">
+              {player.name}
+            </Typography>
+          )}
+          {isEditing ? (
+            <Button
+              size="small"
+              variant="contained"
+              color="success"
+              style={{ marginTop: "0.25rem" }}
+              onClick={handleSubmitNewName}
+            >
+              Submit name change
+            </Button>
+          ) : (
+            <Button
+              size="small"
+              variant="contained"
+              color="info"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit player name
+            </Button>
+          )}
           <Typography className="text-gray-600">
             Played in {games.length} games
           </Typography>
