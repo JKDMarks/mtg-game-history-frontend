@@ -48,7 +48,7 @@ export default function PageWrapper({
     label: "Record a Game",
     link: "/games/new",
   };
-  const gamesPage: AppBarPage = { label: "All Games", link: "/games" };
+  const gamesPage: AppBarPage = { label: "Previous Games", link: "/games" };
   const playersPage: AppBarPage = { label: "Players", link: "/players" };
   // const decksPage: AppBarPage = { label: "Decks", link: "/decks" };
 

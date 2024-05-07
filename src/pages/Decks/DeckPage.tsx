@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { PageWrapper, GamesGrid } from "../../components";
 import { useContext, useEffect, useState } from "react";
 import { Deck, Game, NAME_RGX, callAPI, fakeDeck } from "../../helpers";
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, Link, TextField, Typography } from "@mui/material";
 import { IsLoadingContext } from "../../App";
 
 export default function DeckPage() {
@@ -82,7 +82,10 @@ export default function DeckPage() {
             />
           ) : (
             <Typography variant="h5" className="underline">
-              {deck.player.name}'s {deck.name}
+              <Link href={"/players/" + deck.player.id}>
+                {deck.player.name}
+              </Link>
+              's {deck.name}
             </Typography>
           )}
           {isEditing ? (
