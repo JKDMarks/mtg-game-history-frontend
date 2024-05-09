@@ -137,6 +137,21 @@ export default function NewOrEditGamePage({
   /////////////
   // Helpers //
   /////////////
+  const resetGame = () => {
+    const confirm = window.confirm(
+      "Reset this game? This will not delete any players or decks"
+    );
+    if (!confirm) {
+      return;
+    }
+    setNewPlayerDecks([
+      { ...emptyNewPlayerDeck },
+      { ...emptyNewPlayerDeck },
+      { ...emptyNewPlayerDeck },
+      { ...emptyNewPlayerDeck },
+    ]);
+  };
+
   const setNthNewPlayerDeckFactory =
     (n: number): SetNewPlayerDeckFunctionType =>
     ({ player, deck, cards }) => {
@@ -332,6 +347,19 @@ export default function NewOrEditGamePage({
           sx={{ marginBottom: "0.75rem" }}
         >
           {isEditing ? "Edit Game " + gameId : "Record a New Game"}
+          {!isEditing && (
+            <>
+              <br />
+              <Button
+                variant="contained"
+                color="error"
+                sx={{ maxWidth: "150px" }}
+                onClick={resetGame}
+              >
+                Reset Game
+              </Button>
+            </>
+          )}
         </Typography>
         <FormControl component="form" onSubmit={handleSubmitNewGame}>
           <Box
