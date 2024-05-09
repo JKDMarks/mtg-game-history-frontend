@@ -104,7 +104,7 @@ export default function NewOrEditGamePage({
       setIsLoading(false);
     };
 
-    // fakePlayer.id == 1; fakeDeck.id == 1;
+    // fakePlayer.id == -1; fakeDeck.id == -1;
     const shouldNotContinue = newPlayerDecks.some(
       (pd) => pd.player.id > 0 || pd.deck.id > 0
     );
