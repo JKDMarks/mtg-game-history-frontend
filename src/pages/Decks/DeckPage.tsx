@@ -1,7 +1,13 @@
 import { useParams } from "react-router-dom";
-import { PageWrapper, GamesGrid } from "../../components";
+import { PageWrapper, GamesGrid, Divider } from "../../components";
 import { useContext, useEffect, useState } from "react";
-import { Deck, Game, NAME_RGX, callAPI, fakeDeck } from "../../helpers";
+import {
+  DeckWithCards,
+  Game,
+  NAME_RGX,
+  callAPI,
+  fakeDeck,
+} from "../../helpers";
 import { Button, Link, TextField, Typography } from "@mui/material";
 import { IsLoadingContext } from "../../App";
 
@@ -9,7 +15,7 @@ export default function DeckPage() {
   const { setIsLoading } = useContext(IsLoadingContext);
   const { deckId } = useParams();
 
-  const [deck, setDeck] = useState<Deck>({ ...fakeDeck });
+  const [deck, setDeck] = useState<DeckWithCards>({ ...fakeDeck, cards: [] });
   const [games, setGames] = useState<Game[]>([]);
   const [gameWinCt, setGameWinCt] = useState<number>(0);
 
@@ -118,6 +124,20 @@ export default function DeckPage() {
             Won {gameWinCt} games (
             {((gameWinCt / games.length) * 100).toFixed(2)}%)
           </Typography>
+          {deck.cards?.length > 0 && (
+            <>
+              <Divider margins />
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                Cards in deck
+              </Typography>
+              <ul>
+                {deck.cards.map((cardName, i) => (
+                  <li key={i}>{cardName}</li>
+                ))}
+              </ul>
+              <Divider margins />
+            </>
+          )}
           <GamesGrid games={games} shouldShowPrivateGames />
         </>
       ) : (

@@ -32,6 +32,10 @@ export interface Deck {
   player: Player;
 }
 
+export interface DeckWithCards extends Deck {
+  cards: string[];
+}
+
 export interface GamePlayerDeck {
   id: number;
   is_winner: 0 | 1;
