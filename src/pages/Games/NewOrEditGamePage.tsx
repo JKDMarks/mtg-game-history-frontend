@@ -137,20 +137,22 @@ export default function NewOrEditGamePage({
   /////////////
   // Helpers //
   /////////////
-  const resetGame = () => {
-    const confirm = window.confirm(
-      "Reset this game? This will not delete any players or decks"
-    );
-    if (!confirm) {
-      return;
-    }
-    setNewPlayerDecks([
-      { ...emptyNewPlayerDeck },
-      { ...emptyNewPlayerDeck },
-      { ...emptyNewPlayerDeck },
-      { ...emptyNewPlayerDeck },
-    ]);
-  };
+
+  // this doesn't work currently because of fetchMostRecentGame
+  // const resetGame = () => {
+  //   const confirm = window.confirm(
+  //     "Reset this game? This will not delete any players or decks"
+  //   );
+  //   if (!confirm) {
+  //     return;
+  //   }
+  //   setNewPlayerDecks([
+  //     { ...emptyNewPlayerDeck },
+  //     { ...emptyNewPlayerDeck },
+  //     { ...emptyNewPlayerDeck },
+  //     { ...emptyNewPlayerDeck },
+  //   ]);
+  // };
 
   const setNthNewPlayerDeckFactory =
     (n: number): SetNewPlayerDeckFunctionType =>
@@ -347,7 +349,7 @@ export default function NewOrEditGamePage({
           sx={{ marginBottom: "0.75rem" }}
         >
           {isEditing ? "Edit Game " + gameId : "Record a New Game"}
-          {!isEditing && (
+          {/* {!isEditing && (
             <>
               <br />
               <Button
@@ -359,7 +361,7 @@ export default function NewOrEditGamePage({
                 Reset Game
               </Button>
             </>
-          )}
+          )} */}
         </Typography>
         <FormControl component="form" onSubmit={handleSubmitNewGame}>
           <Box
