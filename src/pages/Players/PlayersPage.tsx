@@ -26,7 +26,7 @@ export default function PlayersPage() {
         <Grid container columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} spacing={2}>
           {players.length > 0 &&
             players.map((player, pIdx) => (
-              <Grid item xs={1}>
+              <Grid item key={player.name} xs={1}>
                 <Box className="border border-solid border-gray-400 rounded flex flex-col items-start text-left p-1 h-100 w-100">
                   <Link href={`/players/${player.id}`}>{player.name}</Link>
 

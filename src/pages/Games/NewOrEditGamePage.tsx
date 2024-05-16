@@ -35,7 +35,7 @@ import {
 import NewGameSinglePlayerDeck from "./NewGameSinglePlayerDeck";
 import NewPlayerDialog from "./NewPlayerDialog";
 import NewDeckDialog from "./NewDeckDialog";
-import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
+import { useParams, useRouteLoaderData } from "react-router-dom";
 import { IsLoadingContext, ROOT_ROUTE_ID } from "../../App";
 
 export default function NewOrEditGamePage({
@@ -43,7 +43,6 @@ export default function NewOrEditGamePage({
 }: {
   isEditing?: boolean;
 }) {
-  const navigate = useNavigate();
   const currUser = useRouteLoaderData(ROOT_ROUTE_ID) as User;
   const { setIsLoading } = useContext(IsLoadingContext);
 
@@ -88,7 +87,7 @@ export default function NewOrEditGamePage({
       const resp = await callAPI("/games/" + gameId);
       const game: Game = await resp.json();
       if (!canCurrUserViewGame(currUser, game)) {
-        navigate("/");
+        window.location.pathname = "/";
       }
       setNewPlayerDecks(game.game_player_decks);
       setGpdIds(game.game_player_decks.map((gpd) => gpd.id));
@@ -118,7 +117,6 @@ export default function NewOrEditGamePage({
     gameId,
     isEditing,
     currUser,
-    navigate,
     setIsLoading,
   ]);
 
@@ -334,7 +332,7 @@ export default function NewOrEditGamePage({
     });
     const newGame = await resp.json();
     if (newGame.id) {
-      navigate(`/games/${newGame.id}`);
+      window.location.pathname = `/games/${newGame.id}`;
     } else {
       setErrorMsg(newGame.message);
     }
