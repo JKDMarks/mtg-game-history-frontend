@@ -100,7 +100,7 @@ function App() {
           }}
         >
           <img
-            src="https://raw.githubusercontent.com/JKDMarks/trade-tracker-mobile/master/public/images/WUBRG.png"
+            src="/WUBRG.png"
             className="spin"
             height="150px"
             width="150px"
