@@ -269,6 +269,7 @@ export default function NewOrEditGamePage({
     setTimeout(() => (document.activeElement as HTMLElement)?.blur(), 100);
     const tempNewPDs = [...newPlayerDecks];
     tempNewPDs[newDeckDialogOpenedFromIndex].deck = newDeck;
+    setNewPlayerDecks(tempNewPDs);
     fetchDecks(setDecks);
     handleCloseNewDeckDialog();
   };
