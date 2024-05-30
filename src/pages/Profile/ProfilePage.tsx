@@ -65,6 +65,16 @@ export default function ProfilePage() {
     }
   };
 
+  const handleLogout = async () => {
+    const resp = await callAPI("/auth/logout");
+    const json = await resp.json();
+    if (resp.status === 200 && json.loggedIn === false) {
+      window.location.href = window.location.origin;
+    } else {
+      window.alert("Something went wrong, please try again.");
+    }
+  };
+
   return (
     <PageWrapper>
       <Box
@@ -79,10 +89,7 @@ export default function ProfilePage() {
               variant="contained"
               color="error"
               sx={{ width: "200px" }}
-              onClick={async () => {
-                await callAPI("/auth/logout");
-                window.location.href = window.location.origin;
-              }}
+              onClick={handleLogout}
             >
               Logout
             </Button>
