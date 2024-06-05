@@ -23,7 +23,7 @@ export async function callAPI(
   return await fetch(import.meta.env.VITE_API_URL + route, {
     method: options?.method ?? "GET",
     mode: "cors",
-    credentials: "same-origin",
+    credentials: import.meta.env.VITE_DIFF_ORIGIN ? "include" : "same-origin",
     body: options?.body ? JSON.stringify(options.body) : null,
     headers: {
       ...headers,
