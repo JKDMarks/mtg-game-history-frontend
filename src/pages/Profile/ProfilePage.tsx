@@ -113,7 +113,7 @@ export default function ProfilePage() {
               >
                 <ErrorIcon color="error" sx={{ marginRight: "2px" }} />
                 <br />
-                Please complete your registration by changing your username and
+                Please complete your signup by changing your username and
                 password. Until then, you will have limited capabilities as a
                 user.
               </FormHelperText>
