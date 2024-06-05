@@ -66,7 +66,7 @@ export default function ProfilePage() {
   };
 
   const handleLogout = async () => {
-    const resp = await callAPI("/auth/logout");
+    const resp = await callAPI("/auth/logout", { method: "POST" });
     const json = await resp.json();
     if (resp.status === 200 && json.loggedIn === false) {
       window.location.href = window.location.origin;
