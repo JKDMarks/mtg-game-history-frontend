@@ -1,4 +1,5 @@
 export { default as NotFoundPage } from "./NotFoundPage";
+export { default as AboutPage } from "./AboutPage";
 export * from "./LoginSignup";
 export * from "./Games";
 export * from "./Home";

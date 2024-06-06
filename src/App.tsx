@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 import {
+  AboutPage,
   AllGamesPage,
   DeckPage,
   GamePage,
@@ -69,6 +70,7 @@ const router = createBrowserRouter(
         <Route path=":deckId" element={<DeckPage />} />
       </Route>
       <Route path="profile" element={<ProfilePage />} />
+      <Route path="about" element={<AboutPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Route>
   )
