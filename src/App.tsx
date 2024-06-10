@@ -91,25 +91,24 @@ function App() {
 
   return (
     <>
-      {isLoading && (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: 2147483647,
-          }}
-        >
-          <img
-            src="/WUBRG.png"
-            className="spin"
-            height="150px"
-            width="150px"
-            alt="spinning mana pentagon"
-          />
-        </div>
-      )}
+      <div
+        style={{
+          visibility: isLoading ? "visible" : "hidden",
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 2147483647,
+        }}
+      >
+        <img
+          src="/WUBRG.png"
+          className="spin"
+          height="150px"
+          width="150px"
+          alt="spinning mana pentagon"
+        />
+      </div>
 
       <IsLoadingContext.Provider value={isLoadingContext}>
         <RouterProvider router={router} />
