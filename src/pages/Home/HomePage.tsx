@@ -67,6 +67,27 @@ function HomePage() {
           </Typography>
         )}
         <GamesGrid games={games} />
+        <Box className="flex justify-center">
+          <Button
+            variant="contained"
+            component={Link}
+            href="https://www.youtube.com/watch?v=hTn3xvbK6Q8"
+            target="_blank"
+            sx={{
+              width: "350px",
+              marginTop: "1.5rem",
+              fontSize: "1rem",
+              color: "black",
+              backgroundColor: "#82f15f",
+              "&:hover": {
+                color: "white",
+                backgroundColor: "#174a07",
+              },
+            }}
+          >
+            How to use this app
+          </Button>
+        </Box>
       </Box>
     </PageWrapper>
   );
