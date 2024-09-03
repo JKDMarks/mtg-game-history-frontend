@@ -4,6 +4,11 @@ import {
   FormControl,
   FormHelperText,
   Grid,
+  InputLabel,
+  MenuItem,
+  NativeSelect,
+  Select,
+  SelectChangeEvent,
   TextField,
   Typography,
   useMediaQuery,
@@ -38,6 +43,7 @@ import NewPlayerDialog from "./NewPlayerDialog";
 import NewDeckDialog from "./NewDeckDialog";
 import { useParams, useRouteLoaderData } from "react-router-dom";
 import { IsLoadingContext, ROOT_ROUTE_ID } from "../../App";
+import { isMobile } from "react-device-detect";
 
 export default function NewOrEditGamePage({
   isEditing = false,
@@ -64,7 +70,7 @@ export default function NewOrEditGamePage({
     { ...emptyNewPlayerDeck },
   ]);
   const [notes, setNotes] = useState("");
-  const [winnerIndex, setWinnerIndex] = useState<number>(-1);
+  const [firstPlayerIdx, setFirstPlayerIdx] = useState<number>(-1);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<number>>(
     new Set()
   );
@@ -74,6 +80,8 @@ export default function NewOrEditGamePage({
   const [gpdIds, setGpdIds] = useState<Array<number | null>>(
     new Array(newPlayerDecks.length).fill(null)
   );
+
+  const [winnerIdx, setWinnerIdx] = useState(-1);
 
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -97,7 +105,14 @@ export default function NewOrEditGamePage({
       }
       setNewPlayerDecks(game.game_player_decks);
       setGpdIds(game.game_player_decks.map((gpd) => gpd.id));
-      setWinnerIndex(game.game_player_decks.findIndex((gpd) => gpd.is_winner));
+      game.game_player_decks.forEach((gpd, i) => {
+        if (gpd.is_winner) {
+          setWinnerIdx(i);
+        }
+        if (gpd.first_player) {
+          setFirstPlayerIdx(i);
+        }
+      });
       if (game.notes) {
         setNotes(game.notes);
       }
@@ -151,6 +166,7 @@ export default function NewOrEditGamePage({
     if (!confirm) {
       return;
     }
+    setWinnerIdx(-1);
     setNewPlayerDecks([
       { ...emptyNewPlayerDeck },
       { ...emptyNewPlayerDeck },
@@ -160,12 +176,17 @@ export default function NewOrEditGamePage({
   };
 
   const clearNthPlayer = (index: number) => {
-    const shouldContinue = window.confirm(
-      `Clear player ${index + 1} and all cards?`
-    );
-    if (!shouldContinue) return;
+    const confirm = window.confirm(`Clear player ${index + 1} and all cards?`);
+    if (!confirm) return;
     const tempNewPDs = [...newPlayerDecks];
     tempNewPDs[index] = { ...emptyNewPlayerDeck };
+    setNewPlayerDecks(tempNewPDs);
+    setWinnerIdx(-1);
+  };
+
+  const handleMulligan = (playerIdx: number, mulliganTo: number) => {
+    const tempNewPDs = [...newPlayerDecks];
+    tempNewPDs[playerIdx].mulligan_count = mulliganTo;
     setNewPlayerDecks(tempNewPDs);
   };
 
@@ -326,7 +347,7 @@ export default function NewOrEditGamePage({
       return;
     }
 
-    if (winnerIndex < 0) {
+    if (winnerIdx < 0) {
       const shouldSubmit = confirm("Submit this game with no winner?");
       if (!shouldSubmit) {
         return;
@@ -339,7 +360,9 @@ export default function NewOrEditGamePage({
         id: isEditing ? gpdIds[i] : undefined,
         player_id: pd.player.id,
         deck_id: pd.deck.id,
-        is_winner: winnerIndex === i,
+        first_player: firstPlayerIdx === i,
+        is_winner: winnerIdx === i,
+        mulligan_count: pd.mulligan_count,
         cards: pd.cards.filter((card) => !!card.name),
       })),
       notes,
@@ -406,11 +429,14 @@ export default function NewOrEditGamePage({
                     setNewPlayerDeck={setNthNewPlayerDeckFactory(i)}
                     players={players}
                     decks={decks}
-                    isWinner={winnerIndex === i}
-                    handleChangeIsWinnerSwitch={(checked) =>
-                      setWinnerIndex(checked ? i : -1)
+                    firstPlayer={firstPlayerIdx === i}
+                    handleFirstPlayerSwitch={(checked) =>
+                      setFirstPlayerIdx(checked ? i : -1)
                     }
                     clearNthPlayer={clearNthPlayer}
+                    handleMulligan={(mulliganCount: number) =>
+                      handleMulligan(i, mulliganCount)
+                    }
                     selectedPlayerIds={selectedPlayerIds}
                     selectedDeckIds={selectedDeckIds}
                     openNewPlayerDialog={handleOpenNewPlayerDialog}
@@ -419,6 +445,60 @@ export default function NewOrEditGamePage({
                   />
                 );
               })}
+              <Grid item xs={4} sx={{ padding: "0 !important" }} />
+              <Grid
+                item
+                xs={1}
+                className="flex flex-row items-center space-x-1"
+              >
+                <Box>⭐</Box>
+                <FormControl fullWidth>
+                  <InputLabel htmlFor="winner-select">Winner</InputLabel>
+                  {isMobile ? (
+                    <NativeSelect
+                      inputProps={{ id: "winner-select" }}
+                      disabled={
+                        selectedPlayerIds.has(-1) ||
+                        selectedPlayerIds.size < newPlayerDecks.length
+                      }
+                      value={winnerIdx}
+                      onChange={(e) => setWinnerIdx(Number(e.target.value))}
+                    >
+                      <option disabled value={-1}>
+                        Winner
+                      </option>
+                      {newPlayerDecks.map((newPD, i) => (
+                        <option key={i} value={i}>
+                          {newPD.player.name}
+                        </option>
+                      ))}
+                    </NativeSelect>
+                  ) : (
+                    <Select
+                      size="small"
+                      disabled={
+                        selectedPlayerIds.has(-1) ||
+                        selectedPlayerIds.size < newPlayerDecks.length
+                      }
+                      value={winnerIdx}
+                      onChange={(e: SelectChangeEvent<number>) =>
+                        setWinnerIdx(Number(e.target.value))
+                      }
+                    >
+                      <MenuItem disabled value={-1}>
+                        Winner
+                      </MenuItem>
+                      {newPlayerDecks.map((newPD, i) => (
+                        <MenuItem key={i} value={i}>
+                          {newPD.player.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                </FormControl>
+                <Box>⭐</Box>
+              </Grid>
+              <Grid item xs={4} sx={{ padding: "0 !important" }} />
               <Grid item xs={1} lg={2}>
                 <TextField
                   id="notes"

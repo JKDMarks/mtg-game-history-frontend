@@ -42,6 +42,8 @@ export interface GamePlayerDeck {
   deck: Deck;
   player: Player;
   cards: Card[];
+  first_player: 0 | 1;
+  mulligan_count: number;
 }
 
 export interface Card {
@@ -56,6 +58,18 @@ export enum USER_LEVEL {
   REGULAR_USER = 5,
   ADMIN = 9,
 }
+
+export const MULLIGANS = {
+  0: "7",
+  1: "2nd 7",
+  2: "6",
+  3: "5",
+  4: "4",
+  5: "3",
+  6: "2",
+  7: "1",
+  8: "0",
+};
 
 // const game_player_decks: GamePlayerDeck[] = [
 //   {

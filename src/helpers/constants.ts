@@ -30,11 +30,13 @@ export type NewPlayerDeck = {
   player: Player;
   deck: Deck;
   cards: Card[];
+  mulligan_count: number;
 };
 export const emptyNewPlayerDeck: NewPlayerDeck = {
   player: { ...fakePlayer },
   deck: { ...fakeDeck },
   cards: [],
+  mulligan_count: 0,
 };
 
 export type SetNewPlayerDeckFunctionType = ({

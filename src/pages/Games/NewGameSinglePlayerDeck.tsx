@@ -2,20 +2,21 @@ import { useEffect, useState } from "react";
 import { isMobile } from "react-device-detect";
 import {
   Box,
+  Button,
   FormControl,
   Grid,
-  IconButton,
   InputLabel,
   ListSubheader,
   MenuItem,
   NativeSelect,
   Select,
+  SelectChangeEvent,
   Switch,
 } from "@mui/material";
-import ClearIcon from "@mui/icons-material/Clear";
 import {
   Card,
   Deck,
+  MULLIGANS,
   NewGameErrors,
   NewPlayerDeck,
   Player,
@@ -26,9 +27,10 @@ import SinglePlayerDeckCards from "./SinglePlayerDeckCards";
 type NewGameSinglePlayerDeckProps = {
   index: number;
   newPlayerDeck: NewPlayerDeck;
-  isWinner: boolean;
-  handleChangeIsWinnerSwitch: (checked: boolean) => void;
+  firstPlayer: boolean;
+  handleFirstPlayerSwitch: (checked: boolean) => void;
   clearNthPlayer: (index: number) => void;
+  handleMulligan: (mulliganCount: number) => void;
   selectedPlayerIds: Set<number>;
   selectedDeckIds: Set<number>;
   players: Player[];
@@ -47,9 +49,10 @@ interface SimplePlayer {
 export default function NewGameSinglePlayerDeck({
   index,
   newPlayerDeck,
-  isWinner,
-  handleChangeIsWinnerSwitch,
+  firstPlayer,
+  handleFirstPlayerSwitch,
   clearNthPlayer,
+  handleMulligan,
   selectedPlayerIds,
   selectedDeckIds,
   players,
@@ -98,25 +101,63 @@ export default function NewGameSinglePlayerDeck({
   return (
     <Grid item xs={1}>
       <Box>
-        {/* <Box>Player {index + 1}</Box> */}
-        <Box className="flex flex-row justify-between items-center">
-          <Box>Player {index + 1} Winner</Box>
+        <Box sx={{ textDecoration: "underline" }}>Player {index + 1}</Box>
+        <Button
+          color="error"
+          variant="outlined"
+          size="small"
+          onClick={() => clearNthPlayer(index)}
+          sx={{ paddingY: "0px" }}
+        >
+          Clear Player
+        </Button>
+        <Box className="flex flex-row justify-center items-center">
+          <Box>Went first</Box>
           <Switch
-            checked={isWinner}
-            onChange={(_, checked) => handleChangeIsWinnerSwitch(checked)}
+            checked={firstPlayer}
+            onChange={(_, checked) => handleFirstPlayerSwitch(checked)}
           />
-          <IconButton
-            color="error"
-            onClick={() => clearNthPlayer(index)}
-            sx={{ paddingX: "0" }}
-          >
-            <ClearIcon />
-          </IconButton>
+        </Box>
+
+        <Box className="flex flex-row justify-center items-center space-x-1">
+          <Box>Mulligan to</Box>
+          <FormControl>
+            {isMobile ? (
+              <>
+                <NativeSelect
+                  value={newPlayerDeck.mulligan_count}
+                  onChange={(e) => handleMulligan(Number(e.target.value))}
+                >
+                  {Object.entries(MULLIGANS).map(([k, v]) => (
+                    <option value={k}>{v}</option>
+                  ))}
+                </NativeSelect>
+              </>
+            ) : (
+              <Select
+                size="small"
+                value={newPlayerDeck.mulligan_count}
+                onChange={(e: SelectChangeEvent<number>) =>
+                  handleMulligan(Number(e.target.value))
+                }
+                sx={{
+                  width: "90px",
+                  "& .MuiInputBase-input": { paddingY: "0px" },
+                }}
+              >
+                {Object.entries(MULLIGANS).map(([k, v]) => (
+                  <MenuItem key={k} value={k}>
+                    {v}
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
+          </FormControl>
         </Box>
       </Box>
 
       {/* PLAYER SELECT */}
-      <FormControl sx={{ width: "100%" }}>
+      <FormControl sx={{ width: "100%", mt: 2 }}>
         {isMobile ? (
           <>
             <InputLabel variant="standard" htmlFor={`player-${index}`}>
@@ -171,6 +212,7 @@ export default function NewGameSinglePlayerDeck({
               labelId={`player-${index}`}
               className="mb-3"
               sx={{ width: "100%" }}
+              size="small"
               // functionality
               error={!!errors.playerDecks[index]?.player}
               // value
@@ -271,6 +313,7 @@ export default function NewGameSinglePlayerDeck({
               labelId={`deck-${index}`}
               className="mb-3"
               sx={{ width: "100%" }}
+              size="small"
               // functionality
               disabled={currPlayerId < 0}
               error={!!errors.playerDecks[index]?.deck}
