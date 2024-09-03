@@ -4,6 +4,7 @@ import {
   FormControl,
   FormHelperText,
   Grid,
+  TextField,
   Typography,
   useMediaQuery,
   useTheme,
@@ -62,6 +63,7 @@ export default function NewOrEditGamePage({
     { ...emptyNewPlayerDeck },
     { ...emptyNewPlayerDeck },
   ]);
+  const [notes, setNotes] = useState("");
   const [winnerIndex, setWinnerIndex] = useState<number>(-1);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<number>>(
     new Set()
@@ -96,6 +98,9 @@ export default function NewOrEditGamePage({
       setNewPlayerDecks(game.game_player_decks);
       setGpdIds(game.game_player_decks.map((gpd) => gpd.id));
       setWinnerIndex(game.game_player_decks.findIndex((gpd) => gpd.is_winner));
+      if (game.notes) {
+        setNotes(game.notes);
+      }
     };
     const fetchData = async () => {
       setIsLoading(true);
@@ -337,6 +342,7 @@ export default function NewOrEditGamePage({
         is_winner: winnerIndex === i,
         cards: pd.cards.filter((card) => !!card.name),
       })),
+      notes,
     };
     const apiRoute = isEditing ? `/games/${gameId}/edit` : "/games";
     const resp = await callAPI(apiRoute, {
@@ -382,9 +388,15 @@ export default function NewOrEditGamePage({
               flexDirection: "column",
               alignItems: "center",
             }}
-            className="space-y-4"
+            // className="space-y-6"
           >
-            <Grid container spacing={4} columns={{ xs: 1, md: 2, lg: 4 }}>
+            <Grid
+              container
+              spacing={4}
+              columns={{ xs: 1, md: 2, lg: 4 }}
+              sx={{ justifyContent: "center" }}
+              rowSpacing={2}
+            >
               {newPlayerDecks.map((newPlayerDeck, i) => {
                 return (
                   <NewGameSinglePlayerDeck
@@ -407,13 +419,26 @@ export default function NewOrEditGamePage({
                   />
                 );
               })}
+              <Grid item xs={1} lg={2}>
+                <TextField
+                  id="notes"
+                  label="Notes"
+                  variant="outlined"
+                  multiline
+                  rows={4}
+                  fullWidth
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </Grid>
             </Grid>
+
             {errorMsg && <FormHelperText error>{errorMsg}</FormHelperText>}
             <Button
               type="submit"
               variant="contained"
               sx={{
-                // marginTop: "2rem",
+                marginTop: "2rem",
                 paddingX: "2rem",
                 letterSpacing: "0.125rem",
               }}

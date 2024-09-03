@@ -95,7 +95,15 @@ export default function GamePage() {
                 }
               )}
             </Grid>
-            {game.notes && <Box>Notes: {game.notes}</Box>}
+            {game.notes && (
+              <>
+                <br />
+                <Box sx={{ whiteSpace: "pre-wrap" }}>
+                  <Box sx={{ textDecoration: "underline" }}>Notes</Box>
+                  <Box>{game.notes}</Box>
+                </Box>
+              </>
+            )}
           </>
         )}
       </Box>
