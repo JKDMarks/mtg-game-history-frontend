@@ -54,6 +54,8 @@ export default function NewOrEditGamePage({
   const [players, setPlayers] = useState<Player[]>([]);
   const [decks, setDecks] = useState<Deck[]>([]);
 
+  const [firstLoadComplete, setFirstLoadComplete] = useState<boolean>(false);
+
   const [newPlayerDecks, setNewPlayerDecks] = useState<NewPlayerDeck[]>([
     { ...emptyNewPlayerDeck },
     { ...emptyNewPlayerDeck },
@@ -83,6 +85,8 @@ export default function NewOrEditGamePage({
   }, []);
 
   useEffect(() => {
+    if (firstLoadComplete || players.length === 0 || decks.length === 0) return;
+
     const fetchGameData = async () => {
       const resp = await callAPI("/games/" + gameId);
       const game: Game = await resp.json();
@@ -104,11 +108,11 @@ export default function NewOrEditGamePage({
     };
 
     // fakePlayer.id == -1; fakeDeck.id == -1;
-    const shouldNotContinue = newPlayerDecks.some(
-      (pd) => pd.player.id > 0 || pd.deck.id > 0
-    );
-    if (shouldNotContinue) return;
-
+    // const shouldNotContinue = newPlayerDecks.some(
+    //   (pd) => pd.player.id > 0 || pd.deck.id > 0
+    // );
+    if (firstLoadComplete) return;
+    setFirstLoadComplete(true);
     fetchData();
   }, [
     players,
@@ -135,22 +139,30 @@ export default function NewOrEditGamePage({
   /////////////
   // Helpers //
   /////////////
+  const resetGame = () => {
+    const confirm = window.confirm(
+      "Reset this game? This will remove all players, decks, and cards from this game."
+    );
+    if (!confirm) {
+      return;
+    }
+    setNewPlayerDecks([
+      { ...emptyNewPlayerDeck },
+      { ...emptyNewPlayerDeck },
+      { ...emptyNewPlayerDeck },
+      { ...emptyNewPlayerDeck },
+    ]);
+  };
 
-  // this doesn't work currently because of fetchMostRecentGame
-  // const resetGame = () => {
-  //   const confirm = window.confirm(
-  //     "Reset this game? This will not delete any players or decks"
-  //   );
-  //   if (!confirm) {
-  //     return;
-  //   }
-  //   setNewPlayerDecks([
-  //     { ...emptyNewPlayerDeck },
-  //     { ...emptyNewPlayerDeck },
-  //     { ...emptyNewPlayerDeck },
-  //     { ...emptyNewPlayerDeck },
-  //   ]);
-  // };
+  const clearNthPlayer = (index: number) => {
+    const shouldContinue = window.confirm(
+      `Clear player ${index + 1} and all cards?`
+    );
+    if (!shouldContinue) return;
+    const tempNewPDs = [...newPlayerDecks];
+    tempNewPDs[index] = { ...emptyNewPlayerDeck };
+    setNewPlayerDecks(tempNewPDs);
+  };
 
   const setNthNewPlayerDeckFactory =
     (n: number): SetNewPlayerDeckFunctionType =>
@@ -348,19 +360,20 @@ export default function NewOrEditGamePage({
           sx={{ marginBottom: "0.75rem" }}
         >
           {isEditing ? "Edit Game " + gameId : "Record a New Game"}
-          {/* {!isEditing && (
+          {!isEditing && (
             <>
               <br />
               <Button
                 variant="contained"
+                size="small"
                 color="error"
-                sx={{ maxWidth: "150px" }}
+                sx={{ maxWidth: "150px", zIndex: "99" }}
                 onClick={resetGame}
               >
                 Reset Game
               </Button>
             </>
-          )} */}
+          )}
         </Typography>
         <FormControl component="form" onSubmit={handleSubmitNewGame}>
           <Box
@@ -385,6 +398,7 @@ export default function NewOrEditGamePage({
                     handleChangeIsWinnerSwitch={(checked) =>
                       setWinnerIndex(checked ? i : -1)
                     }
+                    clearNthPlayer={clearNthPlayer}
                     selectedPlayerIds={selectedPlayerIds}
                     selectedDeckIds={selectedDeckIds}
                     openNewPlayerDialog={handleOpenNewPlayerDialog}

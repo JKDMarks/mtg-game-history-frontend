@@ -4,6 +4,7 @@ import {
   Box,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   ListSubheader,
   MenuItem,
@@ -11,6 +12,7 @@ import {
   Select,
   Switch,
 } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
 import {
   Card,
   Deck,
@@ -26,6 +28,7 @@ type NewGameSinglePlayerDeckProps = {
   newPlayerDeck: NewPlayerDeck;
   isWinner: boolean;
   handleChangeIsWinnerSwitch: (checked: boolean) => void;
+  clearNthPlayer: (index: number) => void;
   selectedPlayerIds: Set<number>;
   selectedDeckIds: Set<number>;
   players: Player[];
@@ -46,6 +49,7 @@ export default function NewGameSinglePlayerDeck({
   newPlayerDeck,
   isWinner,
   handleChangeIsWinnerSwitch,
+  clearNthPlayer,
   selectedPlayerIds,
   selectedDeckIds,
   players,
@@ -95,12 +99,19 @@ export default function NewGameSinglePlayerDeck({
     <Grid item xs={1}>
       <Box>
         {/* <Box>Player {index + 1}</Box> */}
-        <Box className="flex flex-row justify-center items-center">
+        <Box className="flex flex-row justify-between items-center">
           <Box>Player {index + 1} Winner</Box>
           <Switch
             checked={isWinner}
             onChange={(_, checked) => handleChangeIsWinnerSwitch(checked)}
           />
+          <IconButton
+            color="error"
+            onClick={() => clearNthPlayer(index)}
+            sx={{ paddingX: "0" }}
+          >
+            <ClearIcon />
+          </IconButton>
         </Box>
       </Box>
 
