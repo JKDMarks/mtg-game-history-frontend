@@ -394,8 +394,8 @@ export default function NewOrEditGamePage({
               container
               spacing={4}
               columns={{ xs: 1, md: 2, lg: 4 }}
-              sx={{ justifyContent: "center" }}
               rowSpacing={2}
+              sx={{ justifyContent: "center" }}
             >
               {newPlayerDecks.map((newPlayerDeck, i) => {
                 return (

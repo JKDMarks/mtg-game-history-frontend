@@ -55,7 +55,12 @@ export default function GamePage() {
             >
               Edit Game
             </Button>
-            <Grid container spacing={2} columns={{ xs: 1, md: 2, lg: 4 }}>
+            <Grid
+              container
+              spacing={2}
+              columns={{ xs: 1, md: 2, lg: 4 }}
+              sx={{ justifyContent: "center" }}
+            >
               {game.game_player_decks?.map(
                 ({ player, deck, is_winner, cards }, gpdIdx) => {
                   const didPlayOwnDeck = player.id === deck.player?.id;
@@ -94,16 +99,17 @@ export default function GamePage() {
                   );
                 }
               )}
+              {game.notes && (
+                <>
+                  <Grid item xs={1} lg={2} sx={{ whiteSpace: "pre-wrap" }}>
+                    <Box sx={{ border: "1px solid black", padding: "5px" }}>
+                      <Box sx={{ textDecoration: "underline" }}>Notes</Box>
+                      <Box>{game.notes}</Box>
+                    </Box>
+                  </Grid>
+                </>
+              )}
             </Grid>
-            {game.notes && (
-              <>
-                <br />
-                <Box sx={{ whiteSpace: "pre-wrap" }}>
-                  <Box sx={{ textDecoration: "underline" }}>Notes</Box>
-                  <Box>{game.notes}</Box>
-                </Box>
-              </>
-            )}
           </>
         )}
       </Box>
