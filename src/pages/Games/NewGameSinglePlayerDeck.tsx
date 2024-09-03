@@ -35,6 +35,7 @@ type NewGameSinglePlayerDeckProps = {
   selectedDeckIds: Set<number>;
   players: Player[];
   decks: Deck[];
+  isEditing: boolean;
   errors: NewGameErrors;
   setNewPlayerDeck: SetNewPlayerDeckFunctionType;
   openNewPlayerDialog: (newPlayerName: string, index: number) => void;
@@ -57,6 +58,7 @@ export default function NewGameSinglePlayerDeck({
   selectedDeckIds,
   players,
   decks,
+  isEditing,
   errors,
   setNewPlayerDeck,
   openNewPlayerDialog,
@@ -102,15 +104,18 @@ export default function NewGameSinglePlayerDeck({
     <Grid item xs={1}>
       <Box>
         <Box sx={{ textDecoration: "underline" }}>Player {index + 1}</Box>
-        <Button
-          color="error"
-          variant="outlined"
-          size="small"
-          onClick={() => clearNthPlayer(index)}
-          sx={{ paddingY: "0px" }}
-        >
-          Clear Player
-        </Button>
+        {!isEditing && (
+          <Button
+            color="error"
+            variant="outlined"
+            size="small"
+            onClick={() => clearNthPlayer(index)}
+            sx={{ paddingY: "0px" }}
+          >
+            Clear Player
+          </Button>
+        )}
+
         <Box className="flex flex-row justify-center items-center">
           <Box>Went first</Box>
           <Switch

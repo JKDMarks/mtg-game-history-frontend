@@ -441,6 +441,7 @@ export default function NewOrEditGamePage({
                     selectedDeckIds={selectedDeckIds}
                     openNewPlayerDialog={handleOpenNewPlayerDialog}
                     openNewDeckDialog={handleOpenNewDeckDialog}
+                    isEditing={isEditing}
                     errors={errors}
                   />
                 );
