@@ -76,6 +76,31 @@ export default function DeckPage() {
     }
   };
 
+  const archiveOrUnarchiveDeck = async () => {
+    const alertText = `${
+      deck.is_archived ? "Unarchive" : "Archive"
+    } this deck? Archiving a deck will prevent it from being added to new games, but will not delete its data.`;
+    const confirm = window.confirm(alertText);
+    if (!confirm) {
+      return;
+    }
+
+    const resp = await callAPI("/decks/" + deck.id + "/edit", {
+      method: "POST",
+      body: { is_archived: !deck.is_archived },
+    });
+    const json = await resp.json();
+    if (json.success === true) {
+      if (json.redirect) {
+        window.location.pathname = json.redirect;
+      } else {
+        window.location.reload();
+      }
+    } else {
+      window.alert(json.message);
+    }
+  };
+
   return (
     <PageWrapper>
       {deck.id > 0 ? (
@@ -91,7 +116,7 @@ export default function DeckPage() {
               <Link href={"/players/" + deck.player.id}>
                 {deck.player.name}
               </Link>
-              's {deck.name}
+              's {deck.name} {deck.is_archived ? "(Archived)" : ""}
             </Typography>
           )}
           {isEditing ? (
@@ -114,6 +139,16 @@ export default function DeckPage() {
               Edit deck name
             </Button>
           )}
+          <br />
+          <Button
+            size="small"
+            variant="contained"
+            color="secondary"
+            style={{ margin: "0.25rem 0" }}
+            onClick={() => archiveOrUnarchiveDeck()}
+          >
+            {deck.is_archived ? "Unarchive" : "Archive"} Deck
+          </Button>
           <Typography
             className="text-gray-600"
             sx={{ marginTop: "0.5rem", marginBottom: "0.5rem" }}

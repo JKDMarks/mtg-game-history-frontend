@@ -173,9 +173,15 @@ export default function SinglePlayerPage() {
                   marginTop: "-8px",
                 }}
               >
-                {player.decks.map(({ id, name }, i) => (
+                {player.decks.map(({ id, name, is_archived }, i) => (
                   <Grid item key={i} xs={1}>
-                    <Link href={`/decks/${id}`}>{name}</Link>
+                    <Link href={`/decks/${id}`}>
+                      {name}
+                      <span style={{ color: "gray" }}>
+                        {" "}
+                        {is_archived ? "(Archived)" : ""}
+                      </span>
+                    </Link>
                   </Grid>
                 ))}
               </Grid>

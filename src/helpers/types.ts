@@ -31,6 +31,7 @@ export interface Deck {
   user_id?: number;
   name: string;
   player: Player;
+  is_archived: boolean;
 }
 
 export interface DeckWithCards extends Deck {
