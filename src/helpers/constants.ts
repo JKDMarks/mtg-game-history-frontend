@@ -13,12 +13,14 @@ export const fakeGame: Game = {
 export const fakePlayer: Player = {
   id: -1,
   name: "",
+  is_archived: false,
 };
 
 export const fakeDeck: Deck = {
   id: -1,
   name: "",
   player: { ...fakePlayer },
+  is_archived: false,
 };
 
 export const fakeCard: Card = {
