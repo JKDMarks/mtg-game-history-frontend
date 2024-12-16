@@ -11,7 +11,7 @@ export default function PlayersPage() {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      await fetchPlayers(setPlayers);
+      await fetchPlayers(setPlayers, true);
       setIsLoading(false);
     };
     fetchData();
@@ -28,7 +28,9 @@ export default function PlayersPage() {
             players.map((player, pIdx) => (
               <Grid item key={player.name} xs={1}>
                 <Box className="border border-solid border-gray-400 rounded flex flex-col items-start text-left p-1 h-100 w-100">
-                  <Link href={`/players/${player.id}`}>{player.name}</Link>
+                  <Link href={`/players/${player.id}`}>
+                    {player.name} {player.is_archived ? "(Archived)" : ""}
+                  </Link>
 
                   {!!player.decks && player.decks.length > 0 ? (
                     <ul

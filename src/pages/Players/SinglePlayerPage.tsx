@@ -79,6 +79,31 @@ export default function SinglePlayerPage() {
     }
   };
 
+  const archiveOrUnarchivePlayer = async () => {
+    const alertText = `${
+      player.is_archived ? "Unarchive" : "Archive"
+    } this player? Archiving a player will prevent them from being added to new games, but will not delete their data.`;
+    const confirm = window.confirm(alertText);
+    if (!confirm) {
+      return;
+    }
+
+    const resp = await callAPI("/players/" + player.id + "/edit", {
+      method: "POST",
+      body: { is_archived: !player.is_archived },
+    });
+    const json = await resp.json();
+    if (json.success === true) {
+      if (json.redirect) {
+        window.location.pathname = json.redirect;
+      } else {
+        window.location.reload();
+      }
+    } else {
+      window.alert(json.message);
+    }
+  };
+
   return (
     <PageWrapper>
       {player.id > 0 ? (
@@ -91,7 +116,7 @@ export default function SinglePlayerPage() {
             />
           ) : (
             <Typography variant="h5" className="underline">
-              {player.name}
+              {player.name} {player.is_archived ? "(Archived)" : ""}
             </Typography>
           )}
           {isEditing ? (
@@ -114,6 +139,16 @@ export default function SinglePlayerPage() {
               Edit player name
             </Button>
           )}
+          <br />
+          <Button
+            size="small"
+            variant="contained"
+            color="secondary"
+            style={{ margin: "0.25rem 0" }}
+            onClick={() => archiveOrUnarchivePlayer()}
+          >
+            {player.is_archived ? "Unarchive" : "Archive"} Player
+          </Button>
           <Typography className="text-gray-600">
             Played in {games.length} games
           </Typography>

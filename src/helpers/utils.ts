@@ -70,18 +70,23 @@ export const fetchMostRecentGame = async (
 };
 
 export const fetchPlayers = async (
-  setPlayers: (players: PlayerWithDecks[]) => void
+  setPlayers: (players: PlayerWithDecks[]) => void,
+  includeArchivedPlayers: boolean = false
 ) => {
-  const resp = await callAPI("/players");
+  const resp = await callAPI(`/players?is_archived=${includeArchivedPlayers}`);
   const players: PlayerWithDecks[] = await resp.json();
   const sortedPlayers = [...players].sort((p1, p2) =>
     p1.name.localeCompare(p2.name)
   );
+
   setPlayers(sortedPlayers);
 };
 
-export const fetchDecks = async (setDecks: (decks: Deck[]) => void) => {
-  const resp = await callAPI("/decks");
+export const fetchDecks = async (
+  setDecks: (decks: Deck[]) => void,
+  includeArchivedDecks: boolean = false
+) => {
+  const resp = await callAPI(`/decks?is_archived=${includeArchivedDecks}`);
   const decks: Deck[] = await resp.json();
   const sortedDecks = [...decks].sort(
     (d1, d2) => d1.player.id - d2.player.id || d1.name.localeCompare(d2.name)

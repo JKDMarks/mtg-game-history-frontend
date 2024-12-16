@@ -18,6 +18,7 @@ export interface Player {
   id: number;
   user_id?: number;
   name: string;
+  is_archived: boolean;
 }
 
 export interface PlayerWithDecks extends Player {
