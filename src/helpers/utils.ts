@@ -59,11 +59,12 @@ export const fetchMostRecentGame = async (
     mostRecentGame.date === getTodaysDate() &&
     mostRecentGame.game_player_decks
   ) {
-    // const tempNewPlayerDecks = mostRecentGame.game_player_decks.map(
-    //   ({ player, deck }) => ({ player, deck })
-    // );
     setNewPlayerDecks(
-      mostRecentGame.game_player_decks.map((gpd) => ({ ...gpd, cards: [] }))
+      mostRecentGame.game_player_decks.map((gpd) => ({
+        ...gpd,
+        cards: [],
+        mulligan_count: 0,
+      }))
     );
   }
 };
